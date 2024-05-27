@@ -58,11 +58,11 @@ public class StudentEntity extends UserEntity {
         super(null, name, email, password, UserRoleEnum.USER);
 
         if (name == null || name.isBlank()) {
-            throw new RegisterException("Nome do aluno não pode ser nulo");
+            throw new RegisterException("Nome não pode ser nulo");
         }
 
         if (lastName == null || lastName.isBlank()) {
-            throw new RegisterException("Sobrenome do aluno não pode ser nulo");
+            throw new RegisterException("Sobrenome não pode ser nulo");
         }
 
         validStudentEmail(email);
@@ -77,7 +77,7 @@ public class StudentEntity extends UserEntity {
 
     public void validStudentEmail(String email) {
         if (email == null || email.isBlank()) {
-            throw new RegisterException("Email do aluno não pode ser nulo");
+            throw new RegisterException("Email não pode ser nulo");
         }
 
         if (!EmailValidator.getInstance().isValid(email)) {
@@ -133,15 +133,15 @@ public class StudentEntity extends UserEntity {
 
     public void update(StudentRegisterRequest request) {
         if (request == null) {
-            throw new UpdateException("Requisição de atualização do aluno não pode ser nula");
+            throw new UpdateException("Requisição de atualização não pode ser nula");
         }
 
-        this.setName(validateAndAssign(super.getName(), request.getName(), "Nome do aluno não pode ser nulo"));
-        this.setLastName(validateAndAssign(this.lastName, request.getLastName(), "Sobrenome do aluno não pode ser nulo"));
-        this.setEmail(validateAndAssign(super.getEmail(), request.getEmail(), "Email do aluno não pode ser nulo"));
+        this.setName(validateAndAssign(super.getName(), request.getName(), "Nome não pode ser nulo"));
+        this.setLastName(validateAndAssign(this.lastName, request.getLastName(), "Sobrenome não pode ser nulo"));
+        this.setEmail(validateAndAssign(super.getEmail(), request.getEmail(), "Email não pode ser nulo"));
 
         if (request.getPassword() == null) {
-            this.setPassword(validateAndAssign(this.getPassword(), new BCryptPasswordEncoder().encode(request.getPassword()), "Senha do aluno não pode ser nula"));
+            this.setPassword(validateAndAssign(this.getPassword(), new BCryptPasswordEncoder().encode(request.getPassword()), "Senha não pode ser nula"));
         }
     
         if (request.getAddress() != null) {
@@ -183,6 +183,10 @@ public class StudentEntity extends UserEntity {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    public static String getExpectedDomain() {
+        return EXPECTED_DOMAIN;
     }
 
 
