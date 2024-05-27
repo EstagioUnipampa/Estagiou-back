@@ -21,7 +21,8 @@ public class EmailAlreadyRegisteredHandler extends HandlerExceptionUtil {
     @ExceptionHandler(value = EmailAlreadyRegisteredException.class)
     public ResponseEntity<Object> handleEmailAlreadyRegisteredException(Exception e, HttpServletRequest request) {
         log(LogEnum.WARN, e.getMessage(), HttpStatus.BAD_REQUEST.value(), request);
-        return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Email já cadastrado", request));
+        ErrorResponse response = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Email já cadastrado", request);
+        return ResponseEntity.badRequest().body(response);
     }
     
 }

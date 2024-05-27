@@ -20,7 +20,8 @@ public class IllegalArgumentExceptionHandler extends HandlerExceptionUtil {
     @ExceptionHandler(value = IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgumentException(Exception e, HttpServletRequest request) {
         log(LogEnum.WARN, e.getClass().getSimpleName() + ": " + e.getMessage(), HttpStatus.BAD_REQUEST.value(), request);
-        return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage(), request));
+        ErrorResponse response = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage(), request);
+        return ResponseEntity.badRequest().body(response);
     }
     
 }

@@ -19,7 +19,7 @@ public class RuntimeExceptionExceptionHandler extends HandlerExceptionUtil {
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<Object> handleNotFoundException(Exception e, HttpServletRequest request) {
         log(LogEnum.INFO, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), request);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.internalServerError().build();
     }
     
 }

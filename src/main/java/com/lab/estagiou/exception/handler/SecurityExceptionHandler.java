@@ -23,13 +23,15 @@ public class SecurityExceptionHandler extends HandlerExceptionUtil {
     @ExceptionHandler(value = DisabledException.class)
     public ResponseEntity<Object> handleDisabledException(Exception e, HttpServletRequest request) {
         log(LogEnum.WARN, e.getMessage(), HttpStatus.FORBIDDEN.value(), request);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Usuário não está habilitado", request));
+        ErrorResponse response = new ErrorResponse(HttpStatus.FORBIDDEN.value(), e.getMessage(), request);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
     @ExceptionHandler(value = {BadCredentialsException.class, InternalAuthenticationServiceException.class})
     public ResponseEntity<Object> handleBadCredentialsException(Exception e, HttpServletRequest request) {
         log(LogEnum.WARN, e.getMessage(), HttpStatus.BAD_REQUEST.value(), request);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Usuário ou senha inválida", request));
+        ErrorResponse response = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage(), request);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }
 

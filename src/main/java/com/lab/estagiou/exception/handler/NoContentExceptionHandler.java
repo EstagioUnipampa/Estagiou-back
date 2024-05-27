@@ -21,7 +21,8 @@ public class NoContentExceptionHandler extends HandlerExceptionUtil {
     @ExceptionHandler(value = NoContentException.class)
     public ResponseEntity<Object> handleNotFoundException(Exception e, HttpServletRequest request) {
         log(LogEnum.WARN, e.getClass().getSimpleName() + ": " + e.getMessage(), HttpStatus.NO_CONTENT.value(), request);
-        return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.NO_CONTENT.value(), e.getMessage(), request));
+        ErrorResponse response = new ErrorResponse(HttpStatus.NO_CONTENT.value(), e.getMessage(), request);
+        return ResponseEntity.badRequest().body(response);
     }
     
 }
