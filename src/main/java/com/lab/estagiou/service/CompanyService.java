@@ -1,12 +1,17 @@
 package com.lab.estagiou.service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.keygen.BytesKeyGenerator;
+import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 
 import com.lab.estagiou.dto.request.model.company.CompanyRegisterRequest;
@@ -16,6 +21,8 @@ import com.lab.estagiou.exception.generic.NotFoundException;
 import com.lab.estagiou.model.company.CompanyEntity;
 import com.lab.estagiou.model.company.CompanyRepository;
 import com.lab.estagiou.model.company.exception.CnpjAlreadyRegisteredException;
+import com.lab.estagiou.model.emailconfirmationtoken.EmailConfirmationTokenEntity;
+import com.lab.estagiou.model.emailconfirmationtoken.EmailConfirmationTokenRepository;
 import com.lab.estagiou.model.log.LogEnum;
 import com.lab.estagiou.model.user.UserEntity;
 import com.lab.estagiou.service.util.UtilService;
@@ -26,13 +33,33 @@ public class CompanyService extends UtilService {
     @Autowired
     private CompanyRepository companyRepository;
 
+    @Autowired
+    private EmailSendService emailService;
+
+    @Autowired
+    private EmailConfirmationTokenRepository emailConfirmationTokenRepository;
+
     private static final String COMPANY_NOT_FOUND = "Company not found: ";
+
+    private static final BytesKeyGenerator DEFAULT_TOKEN_GENERATOR = KeyGenerators.secureRandom(15);
+
+    @Value("${spring.mail.enable}")
+    private boolean mailInviteEnabled;
 
     public ResponseEntity<Object> registerCompany(CompanyRegisterRequest request) {
         validateUserAndCompany(request);
         
         UserEntity company = new CompanyEntity(request);
+
+        if (!mailInviteEnabled) {
+            company.setEnabled(true);
+        }
+         
         userRepository.save(company);
+
+        if (mailInviteEnabled) {
+            createConfirmationEmailAndSend(company);
+        }
 
         log(LogEnum.INFO, "Registered company: " + company.getId(), HttpStatus.OK.value());
         return ResponseEntity.ok().build();
@@ -91,5 +118,18 @@ public class CompanyService extends UtilService {
         if (companyRepository.existsByCnpj(request.getCnpj())) {
             throw new CnpjAlreadyRegisteredException("CNPJ já cadastrado: " + request.getCnpj());
         }
+    }
+
+    private ResponseEntity<Object> createConfirmationEmailAndSend(UserEntity user) {
+        EmailConfirmationTokenEntity email = createConfirmationEmail(user);
+        emailService.sendEmailAsync(email);
+        return ResponseEntity.ok().build();
+    }
+
+    private EmailConfirmationTokenEntity createConfirmationEmail(UserEntity user) {
+        String token = new String(Base64.encodeBase64URLSafe(DEFAULT_TOKEN_GENERATOR.generateKey()), StandardCharsets.US_ASCII);
+        EmailConfirmationTokenEntity emailConfirmationToken = new EmailConfirmationTokenEntity(token, user);
+
+        return emailConfirmationTokenRepository.save(emailConfirmationToken);
     }
 }

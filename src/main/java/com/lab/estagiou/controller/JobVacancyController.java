@@ -20,7 +20,6 @@ import com.lab.estagiou.controller.util.UtilController;
 import com.lab.estagiou.dto.request.model.jobvacancy.JobVacancyRegisterRequest;
 import com.lab.estagiou.dto.response.error.ErrorResponse;
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
-import com.lab.estagiou.model.student.StudentEntity;
 import com.lab.estagiou.service.JobVacancyService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +64,7 @@ public class JobVacancyController {
 
     @Operation(summary = "Search job vacancy by ID", description = "Search a job vacancy by ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Job vacancy found successfully", content = @Content(schema = @Schema(implementation = StudentEntity.class))),
+        @ApiResponse(responseCode = "200", description = "Job vacancy found successfully", content = @Content(schema = @Schema(implementation = JobVacancyEntity.class))),
         @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "Job vacancy not found", content = @Content),
@@ -95,7 +94,7 @@ public class JobVacancyController {
         @ApiResponse(responseCode = "400", description = "Incorrect atributtes", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "404", description = "Student not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Job vacancy not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/{id}")
