@@ -55,7 +55,7 @@ public class StudentEntity extends UserEntity {
     private static final String EXPECTED_DOMAIN = "@gmail.com";
 
     public StudentEntity(String name, String lastName, String email, String password) {
-        super(null, name, email, password, UserRoleEnum.USER);
+        super(null, name, email, password, UserRoleEnum.STUDENT);
 
         if (name == null || name.isBlank()) {
             throw new RegisterException("Nome não pode ser nulo");

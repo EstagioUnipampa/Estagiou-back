@@ -5,11 +5,16 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+import org.springframework.security.core.Authentication;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lab.estagiou.dto.request.model.enrollment.EnrollmentRegisterRequest;
 import com.lab.estagiou.exception.generic.RegisterException;
+import com.lab.estagiou.exception.generic.UpdateException;
+import com.lab.estagiou.model.admin.AdminEntity;
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 import com.lab.estagiou.model.student.StudentEntity;
+import com.lab.estagiou.model.user.UserEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -76,10 +81,10 @@ public class EnrollmentEntity implements Serializable {
         }
         
         try {
-            if (request.getFile().getBytes().length == 0) {
+            if (request.getFile().get(0).getBytes().length == 0) {
                 throw new RegisterException("Arquivo não pode ser vazio");
             }
-            this.file = request.getFile().getBytes();
+            this.file = request.getFile().get(0).getBytes();
         } catch (IOException e) {
             throw new RegisterException("Erro ao tentar ler o arquivo");
         }
@@ -88,6 +93,49 @@ public class EnrollmentEntity implements Serializable {
         this.jobVacancy = jobVacancy;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
+    }
+
+    public void update(EnrollmentRegisterRequest request) {
+        if (request == null) {
+            throw new UpdateException("Request cannot be null");
+        }
+
+        if (request.getFile() == null) {
+            throw new RegisterException("Arquivo não pode ser nulo");
+        }
+        
+        try {
+            if (request.getFile().get(0).getBytes().length == 0) {
+                throw new RegisterException("Arquivo não pode ser vazio");
+            }
+            this.file = request.getFile().get(0).getBytes();
+        } catch (IOException e) {
+            throw new RegisterException("Erro ao tentar ler o arquivo");
+        }
+
+        this.updatedAt = Instant.now();
+    }
+
+    public boolean equalStudentOrAdmin(Authentication authentication) {
+        if (authentication == null) {
+            return false;
+        }
+
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+
+        return equalStudent(user) || user instanceof AdminEntity;
+    }
+
+    public boolean equalStudent(UserEntity user) {
+        if (user == null) {
+            return false;
+        }
+
+        if (!(user instanceof StudentEntity)) {
+            return false;
+        }
+
+        return this.student.equals(user);
     }
     
 }

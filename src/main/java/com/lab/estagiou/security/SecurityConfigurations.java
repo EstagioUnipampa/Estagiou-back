@@ -24,7 +24,7 @@ public class SecurityConfigurations {
 
     private static final String ADMIN = UserRoleEnum.ADMIN.getRole();
 
-    private static final String USER = UserRoleEnum.USER.getRole();
+    private static final String STUDENT = UserRoleEnum.STUDENT.getRole();
 
     private static final String COMPANY = UserRoleEnum.COMPANY.getRole();
 
@@ -56,6 +56,7 @@ public class SecurityConfigurations {
         companyRequests(authorize);
         jobVacancyRequests(authorize);
         adminRequests(authorize);
+        enrollmentRequests(authorize);
         return authorize.anyRequest().permitAll();
     }
     
@@ -69,9 +70,9 @@ public class SecurityConfigurations {
 
         authorize.requestMatchers(HttpMethod.POST, API_VERSION + "/student/register").permitAll();
         authorize.requestMatchers(HttpMethod.GET, API_VERSION + "/student/list").permitAll();
-        authorize.requestMatchers(HttpMethod.GET, API_VERSION + STUDENT_BY_ID).hasRole(USER);
-        authorize.requestMatchers(HttpMethod.DELETE, API_VERSION + STUDENT_BY_ID).hasRole(USER);
-        authorize.requestMatchers(HttpMethod.PUT, API_VERSION + STUDENT_BY_ID).hasRole(USER);
+        authorize.requestMatchers(HttpMethod.GET, API_VERSION + STUDENT_BY_ID).hasRole(STUDENT);
+        authorize.requestMatchers(HttpMethod.DELETE, API_VERSION + STUDENT_BY_ID).hasRole(STUDENT);
+        authorize.requestMatchers(HttpMethod.PUT, API_VERSION + STUDENT_BY_ID).hasRole(STUDENT);
     }
 
     private void companyRequests(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorize) {
@@ -88,8 +89,8 @@ public class SecurityConfigurations {
         final String JOB_VACANCY_BY_ID = "/jobvacancy/*/";
 
         authorize.requestMatchers(HttpMethod.POST, API_VERSION + "/jobvacancy/register").hasRole(COMPANY);
-        authorize.requestMatchers(HttpMethod.GET, API_VERSION + "/jobvacancy/list").hasRole(USER);
-        authorize.requestMatchers(HttpMethod.GET, API_VERSION + JOB_VACANCY_BY_ID).hasRole(USER);
+        authorize.requestMatchers(HttpMethod.GET, API_VERSION + "/jobvacancy/list").hasRole(STUDENT);
+        authorize.requestMatchers(HttpMethod.GET, API_VERSION + JOB_VACANCY_BY_ID).hasRole(STUDENT);
         authorize.requestMatchers(HttpMethod.DELETE, API_VERSION +  JOB_VACANCY_BY_ID).hasRole(COMPANY);
         authorize.requestMatchers(HttpMethod.PUT, API_VERSION + JOB_VACANCY_BY_ID).hasRole(COMPANY);
     }
@@ -102,6 +103,17 @@ public class SecurityConfigurations {
         authorize.requestMatchers(HttpMethod.GET, API_VERSION + ADMIN_BY_ID).hasRole(ADMIN);
         authorize.requestMatchers(HttpMethod.DELETE, API_VERSION + ADMIN_BY_ID).hasRole(ADMIN);
         authorize.requestMatchers(HttpMethod.PUT, API_VERSION + ADMIN_BY_ID).hasRole(ADMIN);
+    }
+
+    private void enrollmentRequests(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorize) {
+        final String ENROLLMENT_BY_ID = "/enrollment/*/";
+        
+        authorize.requestMatchers(HttpMethod.POST, API_VERSION + "/enrollment/register").hasRole(STUDENT);
+        authorize.requestMatchers(HttpMethod.GET, API_VERSION + "/enrollment/list").hasAnyRole(STUDENT, COMPANY);
+        authorize.requestMatchers(HttpMethod.GET, API_VERSION + ENROLLMENT_BY_ID).hasAnyRole(STUDENT, COMPANY);
+        authorize.requestMatchers(HttpMethod.GET, API_VERSION + "/enrollment/file/" + ENROLLMENT_BY_ID).hasAnyRole(STUDENT, COMPANY);
+        authorize.requestMatchers(HttpMethod.DELETE, API_VERSION + ENROLLMENT_BY_ID).hasRole(STUDENT);
+        authorize.requestMatchers(HttpMethod.PUT, API_VERSION + ENROLLMENT_BY_ID).hasRole(STUDENT);
     }
     
 }

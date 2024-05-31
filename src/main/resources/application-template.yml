@@ -6,6 +6,9 @@ spring:
         # Active profile (development, produce, test. Default: development)
         active: development
 
+    jpa:
+        show-sql: true
+
     datasource:
         url: jdbc:postgresql://localhost:5432/estagiou
         # Add username datasource (Default: postgres)
@@ -27,9 +30,15 @@ spring:
                     auth: true
                     starttls:
                         enable: true
+    
+    servlet:
+        multipart:
+            enabled: true
+            max-file-size: 15MB
+            max-request-size: 15MB
 
 jwt:
-    secret:
+    secret: 1
 
 logs:
     show:

@@ -3,7 +3,7 @@ package com.lab.estagiou.model.user;
 public enum UserRoleEnum {
 
     ADMIN("ADMIN"),
-    USER("USER"),
+    STUDENT("STUDENT"),
     COMPANY("COMPANY");
 
     private String role;
