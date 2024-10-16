@@ -55,7 +55,7 @@ public class StudentEntity extends UserEntity {
     private static final String EXPECTED_DOMAIN = "@gmail.com";
 
     public StudentEntity(String name, String lastName, String email, String password) {
-        super(null, name, email, password, UserRoleEnum.STUDENT);
+        super(null, name, email, password, Role.ROLE_STUDENT);
 
         if (name == null || name.isBlank()) {
             throw new RegisterException("Nome não pode ser nulo");
@@ -141,9 +141,10 @@ public class StudentEntity extends UserEntity {
         this.setEmail(validateAndAssign(super.getEmail(), request.getEmail(), "Email não pode ser nulo"));
 
         if (request.getPassword() == null) {
-            this.setPassword(validateAndAssign(this.getPassword(), new BCryptPasswordEncoder().encode(request.getPassword()), "Senha não pode ser nula"));
+            this.setPassword(validateAndAssign(this.getPassword(),
+                    new BCryptPasswordEncoder().encode(request.getPassword()), "Senha não pode ser nula"));
         }
-    
+
         if (request.getAddress() != null) {
             if (this.address == null) {
                 this.address = new AddressEntity(request.getAddress());
@@ -188,6 +189,5 @@ public class StudentEntity extends UserEntity {
     public static String getExpectedDomain() {
         return EXPECTED_DOMAIN;
     }
-
 
 }
