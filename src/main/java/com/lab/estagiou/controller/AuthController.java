@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,16 +28,17 @@ import jakarta.validation.Valid;
 @RequestMapping(value = UtilController.API_VERSION + "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Auth", description = "API for management of authentication")
 public class AuthController {
-   
+
     @Autowired
     private AuthorizationService authorizationService;
 
     @Operation(summary = "Create token", description = "Create token for user authentication")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Company registered successfully", content = @Content),
-        @ApiResponse(responseCode = "400", description = "User or password incorrects", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "Company registered successfully", content = @Content),
+            @ApiResponse(responseCode = "400", description = "User or password incorrects", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @CrossOrigin(origins = "*")
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid RequestAuthentication authetinticationDto) {
         return authorizationService.login(authetinticationDto);
@@ -44,8 +46,8 @@ public class AuthController {
 
     @Operation(summary = "Logout", description = "Logout user from system")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Logout successfully", content = @Content),
-        @ApiResponse(responseCode = "401", description = "Expired authentication", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Logout successfully", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Expired authentication", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @PostMapping("/logout")
     public ResponseEntity<Object> logout(HttpServletRequest request) {
