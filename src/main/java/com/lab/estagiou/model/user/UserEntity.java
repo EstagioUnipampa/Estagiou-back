@@ -1,11 +1,7 @@
 package com.lab.estagiou.model.user;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -21,7 +17,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -29,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class UserEntity implements UserDetails {
+public abstract class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -45,11 +40,16 @@ public abstract class UserEntity implements UserDetails {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private UserRoleEnum role;
+    @Column(name = "role", nullable = false, length = 25)
+    private Role role = Role.ROLE_STUDENT;
+
+    public enum Role {
+        ROLE_ADMIN, ROLE_STUDENT, ROLE_COMPANY
+    }
 
     private boolean isEnabled;
 
-    protected UserEntity(UUID id, String name, String email, String password, UserRoleEnum role) {
+    protected UserEntity(UUID id, String name, String email, String password, Role role) {
 
         if (name == null || name.isBlank()) {
             throw new RegisterException("Nome não pode ser nulo");
@@ -73,57 +73,6 @@ public abstract class UserEntity implements UserDetails {
         this.password = new BCryptPasswordEncoder().encode(password);
         this.role = role;
         this.isEnabled = false;
-    }
-
-    @Override
-    @JsonIgnore
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (role == UserRoleEnum.ADMIN) {
-            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"),
-                    new SimpleGrantedAuthority("ROLE_COMPANY"));
-        }
-
-        if (role == UserRoleEnum.COMPANY) {
-            return List.of(new SimpleGrantedAuthority("ROLE_COMPANY"));
-        }
-
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-    }
-
-    @Override
-    @JsonIgnore
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    @JsonIgnore
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isEnabled() {
-        return isEnabled;
     }
 
     public void setPassword(String password) {

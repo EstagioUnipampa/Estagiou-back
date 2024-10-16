@@ -14,7 +14,6 @@ import com.lab.estagiou.exception.generic.UpdateException;
 import com.lab.estagiou.model.address.AddressEntity;
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 import com.lab.estagiou.model.user.UserEntity;
-import com.lab.estagiou.model.user.UserRoleEnum;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -23,7 +22,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -52,9 +50,10 @@ public class CompanyEntity extends UserEntity {
     private AddressEntity address;
 
     private static final String JOB_VACANY_NULL = "Vaga não pode ser nula";
-    
-    public CompanyEntity(String name, String email, String password, String cnpj, String accountableName, RequestAddress address) {
-        super(null, name, email, password, UserRoleEnum.COMPANY);
+
+    public CompanyEntity(String name, String email, String password, String cnpj, String accountableName,
+            RequestAddress address) {
+        super(null, name, email, password, Role.ROLE_COMPANY);
 
         if (cnpj == null || cnpj.isBlank()) {
             throw new RegisterException("CNPJ da empresa não pode ser nulo");
@@ -71,7 +70,8 @@ public class CompanyEntity extends UserEntity {
     }
 
     public CompanyEntity(CompanyRegisterRequest request) {
-        this(request.getName(), request.getEmail(), request.getPassword(), request.getCnpj(), request.getAccountableName(), request.getAddress());
+        this(request.getName(), request.getEmail(), request.getPassword(), request.getCnpj(),
+                request.getAccountableName(), request.getAddress());
     }
 
     public boolean addJobVacancy(JobVacancyEntity jobVacancy) {
@@ -120,10 +120,12 @@ public class CompanyEntity extends UserEntity {
         this.setName(validateAndAssign(this.getName(), request.getName(), "Nome da empresa não pode ser nulo"));
         this.setEmail(validateAndAssign(this.getEmail(), request.getEmail(), "Email da empresa não pode ser nulo"));
         this.cnpj = validateAndAssign(this.cnpj, request.getCnpj(), "CNPJ da empresa não pode ser nulo");
-        this.accountableName = validateAndAssign(this.accountableName, request.getAccountableName(), "Responsável pela empresa não pode ser nulo");
+        this.accountableName = validateAndAssign(this.accountableName, request.getAccountableName(),
+                "Responsável pela empresa não pode ser nulo");
 
         if (request.getPassword() == null) {
-            this.setPassword(validateAndAssign(this.getPassword(), new BCryptPasswordEncoder().encode(request.getPassword()), "Senha da empresa não pode ser nula"));
+            this.setPassword(validateAndAssign(this.getPassword(),
+                    new BCryptPasswordEncoder().encode(request.getPassword()), "Senha da empresa não pode ser nula"));
         }
 
         if (request.getAddress() != null) {

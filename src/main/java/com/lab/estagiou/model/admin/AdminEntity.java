@@ -19,11 +19,11 @@ import lombok.ToString;
 public class AdminEntity extends UserEntity {
 
     public AdminEntity(AdminRegisterRequest request) {
-        super(null, request.getName(), request.getEmail(), request.getPassword(), UserRoleEnum.ADMIN);
+        super(null, request.getName(), request.getEmail(), request.getPassword(), Role.ROLE_ADMIN);
     }
 
     public AdminEntity(AdminRegisterRequest request, boolean active) {
-        super(null, request.getName(), request.getEmail(), request.getPassword(), UserRoleEnum.ADMIN);
+        super(null, request.getName(), request.getEmail(), request.getPassword(), Role.ROLE_ADMIN);
         super.setEnabled(active);
     }
 
@@ -36,7 +36,8 @@ public class AdminEntity extends UserEntity {
         this.setEmail(validateAndAssign(this.getEmail(), request.getEmail(), "Email do admin não pode ser nulo"));
 
         if (request.getPassword() == null) {
-            this.setPassword(validateAndAssign(this.getPassword(), new BCryptPasswordEncoder().encode(request.getPassword()), "Senha do admin não pode ser nula"));
+            this.setPassword(validateAndAssign(this.getPassword(),
+                    new BCryptPasswordEncoder().encode(request.getPassword()), "Senha do admin não pode ser nula"));
         }
     }
 
