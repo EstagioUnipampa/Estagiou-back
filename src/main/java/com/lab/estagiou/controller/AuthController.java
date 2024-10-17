@@ -1,5 +1,7 @@
 package com.lab.estagiou.controller;
 
+import java.util.UUID;
+
 import org.springdoc.api.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import com.lab.estagiou.dto.response.auth.LoginResponse;
 import com.lab.estagiou.dto.response.error.ErrorResponse;
 import com.lab.estagiou.jwt.JwtToken;
 import com.lab.estagiou.jwt.JwtUserDetailsService;
+import com.lab.estagiou.model.user.UserRepository;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,6 +41,9 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Operation(summary = "Autenticar na API", description = "Recurso de autenticação na API", responses = {
             @ApiResponse(responseCode = "200", description = "Autenticação realizada com sucesso e retorno de um bearer token", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))),
             @ApiResponse(responseCode = "400", description = "Credenciais inválidas", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
@@ -53,7 +59,11 @@ public class AuthController {
 
             JwtToken token = detailsService.getTokenAuthenticated(dto.getEmail());
 
-            return ResponseEntity.ok(token);
+            UUID id = userRepository.findByEmail(dto.getEmail()).getId();
+
+            LoginResponse response = new LoginResponse(token.getToken(), id);
+
+            return ResponseEntity.ok(response);
         } catch (Exception ex) {
         }
         return ResponseEntity

@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,10 +25,9 @@ import com.lab.estagiou.model.log.LogEnum;
 import com.lab.estagiou.model.student.StudentEntity;
 import com.lab.estagiou.model.student.StudentRepository;
 import com.lab.estagiou.model.user.UserEntity;
-import com.lab.estagiou.service.util.UtilService;
 
 @Service
-public class StudentService extends UtilService {
+public class StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
@@ -45,19 +45,16 @@ public class StudentService extends UtilService {
 
     private static final BytesKeyGenerator DEFAULT_TOKEN_GENERATOR = KeyGenerators.secureRandom(15);
 
-    public ResponseEntity<Object> registerStudent(StudentRegisterRequest request) {
-        if (super.userExists(request)) {
-            throw new EmailAlreadyRegisteredException("Email registration attempt: " + request.getEmail());
-        }
-
-        UserEntity student = new StudentEntity(request);
-
+    public ResponseEntity<Object> registerStudent(StudentEntity student) {
         if (!mailInviteEnabled) {
             student.setEnabled(true);
         }
 
-        student = super.userRepository.save(student);
-        log(LogEnum.INFO, "Student registered: " + student.getId(), HttpStatus.CREATED.value());
+        try {
+            student = studentRepository.save(student);
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyRegisteredException("Email já cadastrado");
+        }
 
         if (mailInviteEnabled) {
             createConfirmationEmailAndSend(student);
@@ -73,34 +70,32 @@ public class StudentService extends UtilService {
             throw new NoContentException("No students registered");
         }
 
-        log(LogEnum.INFO, "List students: " + students.size() + " students", HttpStatus.OK.value());
         return ResponseEntity.ok(students);
     }
 
     public ResponseEntity<Object> searchStudentById(UUID id, Authentication authentication) {
-        super.verifyAuthorization(authentication, id);
+        // super.verifyAuthorization(authentication, id);
 
         StudentEntity student = studentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(STUDENT_NOT_FOUND + id));
 
-        log(LogEnum.INFO, "Student found: " + student.getId(), HttpStatus.OK.value());
         return ResponseEntity.ok(student);
     }
 
     public ResponseEntity<Object> deleteStudentById(UUID id, Authentication authentication) {
-        super.verifyAuthorization(authentication, id);
+        // super.verifyAuthorization(authentication, id);
 
         StudentEntity student = studentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(STUDENT_NOT_FOUND + id));
 
         studentRepository.delete(student);
 
-        log(LogEnum.INFO, "Student deleted: " + id, HttpStatus.NO_CONTENT.value());
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<Object> updateStudent(UUID id, StudentRegisterRequest request, Authentication authentication) {
-        super.verifyAuthorization(authentication, id);
+    public ResponseEntity<Object> updateStudent(UUID id, StudentRegisterRequest request,
+            Authentication authentication) {
+        // super.verifyAuthorization(authentication, id);
 
         StudentEntity student = studentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(STUDENT_NOT_FOUND + id));
@@ -108,7 +103,6 @@ public class StudentService extends UtilService {
         student.update(request);
         studentRepository.save(student);
 
-        log(LogEnum.INFO, "Student updated: " + student.getId(), HttpStatus.NO_CONTENT.value());
         return ResponseEntity.noContent().build();
     }
 
@@ -119,10 +113,11 @@ public class StudentService extends UtilService {
     }
 
     private EmailConfirmationTokenEntity createConfirmationEmail(UserEntity user) {
-        String token = new String(Base64.encodeBase64URLSafe(DEFAULT_TOKEN_GENERATOR.generateKey()), StandardCharsets.US_ASCII);
+        String token = new String(Base64.encodeBase64URLSafe(DEFAULT_TOKEN_GENERATOR.generateKey()),
+                StandardCharsets.US_ASCII);
         EmailConfirmationTokenEntity emailConfirmationToken = new EmailConfirmationTokenEntity(token, user);
 
         return emailConfirmationTokenRepository.save(emailConfirmationToken);
     }
-    
+
 }

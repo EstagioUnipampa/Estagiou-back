@@ -25,10 +25,9 @@ import com.lab.estagiou.model.emailconfirmationtoken.EmailConfirmationTokenEntit
 import com.lab.estagiou.model.emailconfirmationtoken.EmailConfirmationTokenRepository;
 import com.lab.estagiou.model.log.LogEnum;
 import com.lab.estagiou.model.user.UserEntity;
-import com.lab.estagiou.service.util.UtilService;
 
 @Service
-public class CompanyService extends UtilService {
+public class CompanyService {
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -48,20 +47,21 @@ public class CompanyService extends UtilService {
 
     public ResponseEntity<Object> registerCompany(CompanyRegisterRequest request) {
         validateUserAndCompany(request);
-        
+
         UserEntity company = new CompanyEntity(request);
 
         if (!mailInviteEnabled) {
             company.setEnabled(true);
         }
-         
-        userRepository.save(company);
+
+        // userRepository.save(company);
 
         if (mailInviteEnabled) {
             createConfirmationEmailAndSend(company);
         }
 
-        log(LogEnum.INFO, "Registered company: " + company.getId(), HttpStatus.OK.value());
+        // log(LogEnum.INFO, "Registered company: " + company.getId(),
+        // HttpStatus.OK.value());
         return ResponseEntity.ok().build();
     }
 
@@ -72,7 +72,8 @@ public class CompanyService extends UtilService {
             throw new NoContentException("No companies registered");
         }
 
-        log(LogEnum.INFO, "List companies: " + companies.size() + " companies", HttpStatus.OK.value());
+        // log(LogEnum.INFO, "List companies: " + companies.size() + " companies",
+        // HttpStatus.OK.value());
         return ResponseEntity.ok(companies);
     }
 
@@ -80,12 +81,13 @@ public class CompanyService extends UtilService {
         CompanyEntity company = companyRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(COMPANY_NOT_FOUND + id));
 
-        log(LogEnum.INFO, "Company found: " + company.getEmail(), HttpStatus.OK.value());
+        // log(LogEnum.INFO, "Company found: " + company.getEmail(),
+        // HttpStatus.OK.value());
         return ResponseEntity.ok(company);
     }
 
     public ResponseEntity<Object> deleteCompanyById(UUID id, Authentication authentication) {
-        verifyAuthorization(authentication, id);
+        // verifyAuthorization(authentication, id);
 
         if (!companyRepository.existsById(id)) {
             throw new NotFoundException(COMPANY_NOT_FOUND + id);
@@ -93,12 +95,13 @@ public class CompanyService extends UtilService {
 
         companyRepository.deleteById(id);
 
-        log(LogEnum.INFO, "Company deleted: " + id, HttpStatus.NO_CONTENT.value());
+        // log(LogEnum.INFO, "Company deleted: " + id, HttpStatus.NO_CONTENT.value());
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<Object> updateCompany(UUID id, CompanyRegisterRequest request, Authentication authentication) {
-        verifyAuthorization(authentication, id);
+    public ResponseEntity<Object> updateCompany(UUID id, CompanyRegisterRequest request,
+            Authentication authentication) {
+        // verifyAuthorization(authentication, id);
 
         CompanyEntity company = companyRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(COMPANY_NOT_FOUND + id));
@@ -106,14 +109,16 @@ public class CompanyService extends UtilService {
         company.update(request);
         companyRepository.save(company);
 
-        log(LogEnum.INFO, "Company updated: " + company.getId(), HttpStatus.NO_CONTENT.value());
+        // log(LogEnum.INFO, "Company updated: " + company.getId(),
+        // HttpStatus.NO_CONTENT.value());
         return ResponseEntity.noContent().build();
     }
 
     private void validateUserAndCompany(CompanyRegisterRequest request) {
-        if (userExists(request)) {
-            throw new EmailAlreadyRegisteredException("Email já cadastrado: " + request.getEmail());
-        }
+        // if (userExists(request)) {
+        // throw new EmailAlreadyRegisteredException("Email já cadastrado: " +
+        // request.getEmail());
+        // }
 
         if (companyRepository.existsByCnpj(request.getCnpj())) {
             throw new CnpjAlreadyRegisteredException("CNPJ já cadastrado: " + request.getCnpj());
@@ -127,7 +132,8 @@ public class CompanyService extends UtilService {
     }
 
     private EmailConfirmationTokenEntity createConfirmationEmail(UserEntity user) {
-        String token = new String(Base64.encodeBase64URLSafe(DEFAULT_TOKEN_GENERATOR.generateKey()), StandardCharsets.US_ASCII);
+        String token = new String(Base64.encodeBase64URLSafe(DEFAULT_TOKEN_GENERATOR.generateKey()),
+                StandardCharsets.US_ASCII);
         EmailConfirmationTokenEntity emailConfirmationToken = new EmailConfirmationTokenEntity(token, user);
 
         return emailConfirmationTokenRepository.save(emailConfirmationToken);

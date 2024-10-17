@@ -17,10 +17,9 @@ import com.lab.estagiou.model.admin.AdminEntity;
 import com.lab.estagiou.model.admin.AdminRepository;
 import com.lab.estagiou.model.log.LogEnum;
 import com.lab.estagiou.model.user.UserEntity;
-import com.lab.estagiou.service.util.UtilService;
 
 @Service
-public class AdminService extends UtilService {
+public class AdminService {
 
     @Autowired
     private AdminRepository adminRepository;
@@ -28,14 +27,14 @@ public class AdminService extends UtilService {
     private static final String ADMIN_NOT_FOUND = "Admin not found: ";
 
     public ResponseEntity<Object> registerAdmin(AdminRegisterRequest request) {
-        if (super.userExists(request)) {
-            throw new EmailAlreadyRegisteredException("Email registration attempt: " + request.getEmail());
-        }
+        // if (super.userExists(request)) {
+        // throw new EmailAlreadyRegisteredException("Email registration attempt: " +
+        // request.getEmail());
+        // }
 
-        UserEntity admin = new AdminEntity(request, true);
-        super.userRepository.save(admin);
+        // UserEntity admin = new AdminEntity(request, true);
+        // super.userRepository.save(admin);
 
-        log(LogEnum.INFO, "Admin registered: " + admin.getId(), HttpStatus.CREATED.value());
         return ResponseEntity.ok().build();
     }
 
@@ -46,34 +45,35 @@ public class AdminService extends UtilService {
             throw new NoContentException("No admins registered");
         }
 
-        log(LogEnum.INFO, "List admins: " + admins.size(), HttpStatus.OK.value());
         return ResponseEntity.ok(admins);
     }
 
     public ResponseEntity<Object> searchAdminById(UUID id, Authentication authentication) {
-        super.verifyAuthorization(authentication, id);
+        // super.verifyAuthorization(authentication, id);
 
         AdminEntity admin = adminRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ADMIN_NOT_FOUND + id));
 
-        log(LogEnum.INFO, "Admin found: " + admin.getId(), HttpStatus.OK.value());
+        // log(LogEnum.INFO, "Admin found: " + admin.getId(), HttpStatus.OK.value());
         return ResponseEntity.ok(admin);
     }
 
     public ResponseEntity<Object> deleteAdminById(UUID id, Authentication authentication) {
-        super.verifyAuthorization(authentication, id);
-        
+        // super.verifyAuthorization(authentication, id);
+
         AdminEntity admin = adminRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ADMIN_NOT_FOUND + id));
 
         adminRepository.delete(admin);
 
-        log(LogEnum.INFO, "Admin deleted: " + admin.getId(), HttpStatus.NO_CONTENT.value());
+        // log(LogEnum.INFO, "Admin deleted: " + admin.getId(),
+        // HttpStatus.NO_CONTENT.value());
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<Object> updateAdmin(UUID id, AdminRegisterRequest requestCadastro, Authentication authentication) {
-        super.verifyAuthorization(authentication, id);
+    public ResponseEntity<Object> updateAdmin(UUID id, AdminRegisterRequest requestCadastro,
+            Authentication authentication) {
+        // super.verifyAuthorization(authentication, id);
 
         AdminEntity admin = adminRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ADMIN_NOT_FOUND + id));
@@ -81,8 +81,9 @@ public class AdminService extends UtilService {
         admin.update(requestCadastro);
         adminRepository.save(admin);
 
-        log(LogEnum.INFO, "Admin updated: " + admin.getId(), HttpStatus.NO_CONTENT.value());
+        // log(LogEnum.INFO, "Admin updated: " + admin.getId(),
+        // HttpStatus.NO_CONTENT.value());
         return ResponseEntity.noContent().build();
     }
-    
+
 }

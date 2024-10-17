@@ -25,14 +25,13 @@ import com.lab.estagiou.model.log.LogEnum;
 import com.lab.estagiou.model.student.StudentEntity;
 import com.lab.estagiou.model.student.StudentRepository;
 import com.lab.estagiou.model.user.UserEntity;
-import com.lab.estagiou.service.util.UtilService;
 
 @Service
-public class EnrollmentService extends UtilService {
-    
+public class EnrollmentService {
+
     @Autowired
     private EnrollmentRepository enrollmentRepository;
-    
+
     @Autowired
     private StudentRepository studentRepository;
 
@@ -84,7 +83,8 @@ public class EnrollmentService extends UtilService {
             throw new NoContentException("No enrollments registered");
         }
 
-        log(LogEnum.INFO, "List enrollments: " + enrollments.size() + " enrollments", HttpStatus.OK.value());
+        // log(LogEnum.INFO, "List enrollments: " + enrollments.size() + " enrollments",
+        // HttpStatus.OK.value());
         return ResponseEntity.ok(enrollments);
     }
 
@@ -98,48 +98,55 @@ public class EnrollmentService extends UtilService {
     public ResponseEntity<Object> searchEnrollmentFileById(UUID id) {
         EnrollmentEntity enrollment = enrollmentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Enrollment not found"));
-        
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentLength(enrollment.getFile().length);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentLength(enrollment.getFile().length);
 
         return ResponseEntity.ok().headers(headers).body(enrollment.getFile());
     }
 
     public ResponseEntity<Object> deleteEnrollmentById(UUID id, Authentication authentication) {
-        if (authentication == null) {
-            throw new UnauthorizedUserException(UNAUTHORIZED_ACESS_ATTEMPT);
-        }
+        // if (authentication == null) {
+        // throw new UnauthorizedUserException(UNAUTHORIZED_ACESS_ATTEMPT);
+        // }
 
-        EnrollmentEntity enrollment = enrollmentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ENROLLMENT_NOT_FOUND + id));
+        // EnrollmentEntity enrollment = enrollmentRepository.findById(id)
+        // .orElseThrow(() -> new NotFoundException(ENROLLMENT_NOT_FOUND + id));
 
-        if (!enrollment.equalStudentOrAdmin(authentication)) {
-            throw new UnauthorizedUserException(UNAUTHORIZED_ACESS_ATTEMPT_DOTS + ((UserEntity) authentication.getPrincipal()).getId());
-        }
+        // if (!enrollment.equalStudentOrAdmin(authentication)) {
+        // throw new UnauthorizedUserException(
+        // UNAUTHORIZED_ACESS_ATTEMPT_DOTS + ((UserEntity)
+        // authentication.getPrincipal()).getId());
+        // }
 
-        enrollmentRepository.deleteById(id);
+        // enrollmentRepository.deleteById(id);
 
-        log(LogEnum.INFO, "Enrollment deleted: " + id, HttpStatus.NO_CONTENT.value());
+        // log(LogEnum.INFO, "Enrollment deleted: " + id,
+        // HttpStatus.NO_CONTENT.value());
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<Object> updateEnrollment(UUID id, EnrollmentRegisterRequest request, Authentication authentication) {
-        if (authentication == null) {
-            throw new UnauthorizedUserException(UNAUTHORIZED_ACESS_ATTEMPT);
-        }
+    public ResponseEntity<Object> updateEnrollment(UUID id, EnrollmentRegisterRequest request,
+            Authentication authentication) {
+        // if (authentication == null) {
+        // throw new UnauthorizedUserException(UNAUTHORIZED_ACESS_ATTEMPT);
+        // }
 
         EnrollmentEntity enrollment = enrollmentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ENROLLMENT_NOT_FOUND + id));
 
-        if (!enrollment.equalStudentOrAdmin(authentication)) {
-            throw new UnauthorizedUserException(UNAUTHORIZED_ACESS_ATTEMPT_DOTS + ((UserEntity) authentication.getPrincipal()).getId());
-        }
+        // if (!enrollment.equalStudentOrAdmin(authentication)) {
+        // throw new UnauthorizedUserException(
+        // UNAUTHORIZED_ACESS_ATTEMPT_DOTS + ((UserEntity)
+        // authentication.getPrincipal()).getId());
+        // }
 
         enrollment.update(request);
         enrollmentRepository.save(enrollment);
 
-        log(LogEnum.INFO, "Enrollment updated: " + enrollment.getId(), HttpStatus.NO_CONTENT.value());
+        // log(LogEnum.INFO, "Enrollment updated: " + enrollment.getId(),
+        // HttpStatus.NO_CONTENT.value());
         return ResponseEntity.noContent().build();
     }
 
