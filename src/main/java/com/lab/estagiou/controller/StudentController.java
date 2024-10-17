@@ -74,8 +74,9 @@ public class StudentController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Object> searchStudentById(@PathVariable UUID id, Authentication authentication) {
-        return studentService.searchStudentById(id, authentication);
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_COMPANY')")
+    public ResponseEntity<Object> searchStudentById(@PathVariable UUID id) {
+        return studentService.searchStudentById(id);
     }
 
     @Operation(summary = "Delete student by ID", description = "Delete a student by ID")

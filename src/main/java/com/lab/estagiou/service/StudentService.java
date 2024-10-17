@@ -73,8 +73,7 @@ public class StudentService {
         return ResponseEntity.ok(students);
     }
 
-    public ResponseEntity<Object> searchStudentById(UUID id, Authentication authentication) {
-        // super.verifyAuthorization(authentication, id);
+    public ResponseEntity<Object> searchStudentById(UUID id) {
 
         StudentEntity student = studentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(STUDENT_NOT_FOUND + id));

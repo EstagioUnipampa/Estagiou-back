@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.keygen.BytesKeyGenerator;
@@ -20,10 +20,8 @@ import com.lab.estagiou.exception.generic.NoContentException;
 import com.lab.estagiou.exception.generic.NotFoundException;
 import com.lab.estagiou.model.company.CompanyEntity;
 import com.lab.estagiou.model.company.CompanyRepository;
-import com.lab.estagiou.model.company.exception.CnpjAlreadyRegisteredException;
 import com.lab.estagiou.model.emailconfirmationtoken.EmailConfirmationTokenEntity;
 import com.lab.estagiou.model.emailconfirmationtoken.EmailConfirmationTokenRepository;
-import com.lab.estagiou.model.log.LogEnum;
 import com.lab.estagiou.model.user.UserEntity;
 
 @Service
@@ -46,22 +44,22 @@ public class CompanyService {
     private boolean mailInviteEnabled;
 
     public ResponseEntity<Object> registerCompany(CompanyRegisterRequest request) {
-        validateUserAndCompany(request);
-
-        UserEntity company = new CompanyEntity(request);
+        CompanyEntity company = new CompanyEntity(request);
 
         if (!mailInviteEnabled) {
             company.setEnabled(true);
         }
 
-        // userRepository.save(company);
+        try {
+            companyRepository.save(company);
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyRegisteredException("Email already registered");
+        }
 
         if (mailInviteEnabled) {
             createConfirmationEmailAndSend(company);
         }
 
-        // log(LogEnum.INFO, "Registered company: " + company.getId(),
-        // HttpStatus.OK.value());
         return ResponseEntity.ok().build();
     }
 
@@ -112,17 +110,6 @@ public class CompanyService {
         // log(LogEnum.INFO, "Company updated: " + company.getId(),
         // HttpStatus.NO_CONTENT.value());
         return ResponseEntity.noContent().build();
-    }
-
-    private void validateUserAndCompany(CompanyRegisterRequest request) {
-        // if (userExists(request)) {
-        // throw new EmailAlreadyRegisteredException("Email já cadastrado: " +
-        // request.getEmail());
-        // }
-
-        if (companyRepository.existsByCnpj(request.getCnpj())) {
-            throw new CnpjAlreadyRegisteredException("CNPJ já cadastrado: " + request.getCnpj());
-        }
     }
 
     private ResponseEntity<Object> createConfirmationEmailAndSend(UserEntity user) {

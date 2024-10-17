@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -15,8 +15,6 @@ import com.lab.estagiou.exception.generic.NoContentException;
 import com.lab.estagiou.exception.generic.NotFoundException;
 import com.lab.estagiou.model.admin.AdminEntity;
 import com.lab.estagiou.model.admin.AdminRepository;
-import com.lab.estagiou.model.log.LogEnum;
-import com.lab.estagiou.model.user.UserEntity;
 
 @Service
 public class AdminService {
@@ -27,13 +25,14 @@ public class AdminService {
     private static final String ADMIN_NOT_FOUND = "Admin not found: ";
 
     public ResponseEntity<Object> registerAdmin(AdminRegisterRequest request) {
-        // if (super.userExists(request)) {
-        // throw new EmailAlreadyRegisteredException("Email registration attempt: " +
-        // request.getEmail());
-        // }
 
-        // UserEntity admin = new AdminEntity(request, true);
-        // super.userRepository.save(admin);
+        AdminEntity admin = new AdminEntity(request, true);
+
+        try {
+            adminRepository.save(admin);
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyRegisteredException("Email já registrado");
+        }
 
         return ResponseEntity.ok().build();
     }
