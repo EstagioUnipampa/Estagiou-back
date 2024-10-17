@@ -51,22 +51,22 @@ public class EnrollmentService {
             throw new RegisterException("Inscrição já realizada");
         }
 
-        if (request.getFile() == null) {
-            throw new RegisterException("Um arquivo é necessário");
-        }
+        // if (request.getFile() == null) {
+        // throw new RegisterException("Um arquivo é necessário");
+        // }
 
-        if (request.getFile().size() > 1) {
-            throw new RegisterException("Só é permitido o envio de 01 arquivo.");
-        }
+        // if (request.getFile().size() > 1) {
+        // throw new RegisterException("Só é permitido o envio de 01 arquivo.");
+        // }
 
-        String contentType = request.getFile().get(0).getContentType();
-        if (contentType == null) {
-            throw new RegisterException("Formato de arquivo inválido");
-        }
+        // String contentType = request.getFile().get(0).getContentType();
+        // if (contentType == null) {
+        // throw new RegisterException("Formato de arquivo inválido");
+        // }
 
-        if (!contentType.equals(MediaType.APPLICATION_PDF_VALUE)) {
-            throw new RegisterException("Formato de arquivo inválido");
-        }
+        // if (!contentType.equals(MediaType.APPLICATION_PDF_VALUE)) {
+        // throw new RegisterException("Formato de arquivo inválido");
+        // }
 
         EnrollmentEntity enrollment = new EnrollmentEntity(request, student, jobVacancy);
         enrollmentRepository.save(enrollment);

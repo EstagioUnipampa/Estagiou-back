@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,10 +40,10 @@ public class EnrollmentController {
 
     @Operation(summary = "Register enrollment", description = "Register an enrollment")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Enrollment registered successfully"),
-        @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "201", description = "Enrollment registered successfully"),
+            @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/register")
     public ResponseEntity<Object> registerEnrollment(@ModelAttribute EnrollmentRegisterRequest request) {
@@ -51,12 +52,13 @@ public class EnrollmentController {
 
     @Operation(summary = "List enrollments", description = "List all enrollments")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Enrollments listed successfully"),
-        @ApiResponse(responseCode = "204", description = "No enrollments found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "Enrollments listed successfully"),
+            @ApiResponse(responseCode = "204", description = "No enrollments found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COMPANY', 'ROLE_STUDENT')")
     @GetMapping("/list")
     public ResponseEntity<List<EnrollmentEntity>> listEnrollments() {
         return enrollmentService.listEnrollments();
@@ -64,11 +66,11 @@ public class EnrollmentController {
 
     @Operation(summary = "Search enrollment by ID", description = "Search an enrollment by ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Enrollment found successfully", content = @Content(schema = @Schema(implementation = EnrollmentEntity.class))),
-        @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "404", description = "Enrollment not found", content = @Content),
-        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Enrollment found successfully", content = @Content(schema = @Schema(implementation = EnrollmentEntity.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Enrollment not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/{id}")
     public ResponseEntity<Object> searchEnrollmentById(@PathVariable UUID id) {
@@ -77,11 +79,11 @@ public class EnrollmentController {
 
     @Operation(summary = "Search enrollment file by ID", description = "Search an enrollment file by ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Enrollment file found successfully", content = @Content(schema = @Schema(implementation = EnrollmentEntity.class))),
-        @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "404", description = "Enrollment file not found", content = @Content),
-        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Enrollment file found successfully", content = @Content(schema = @Schema(implementation = EnrollmentEntity.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Enrollment file not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/file/{id}")
     public ResponseEntity<Object> searchEnrollmentFileById(@PathVariable UUID id) {
@@ -90,11 +92,11 @@ public class EnrollmentController {
 
     @Operation(summary = "Delete enrollment by ID", description = "Delete an enrollment by ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Enrollment deleted successfully", content = @Content),
-        @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "404", description = "Enrollment not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "204", description = "Enrollment deleted successfully", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Enrollment not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteEnrollmentById(@PathVariable UUID id, Authentication authentication) {
@@ -103,16 +105,17 @@ public class EnrollmentController {
 
     @Operation(summary = "Update enrollment", description = "Update an enrollment")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Enrollment updated successfully", content = @Content),
-        @ApiResponse(responseCode = "400", description = "Incorrect atributtes", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "404", description = "Enrollment not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "204", description = "Enrollment updated successfully", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Incorrect atributtes", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Enrollment not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateEnrollment(@PathVariable UUID id, @ModelAttribute EnrollmentRegisterRequest request, Authentication authentication) {
+    public ResponseEntity<Object> updateEnrollment(@PathVariable UUID id,
+            @ModelAttribute EnrollmentRegisterRequest request, Authentication authentication) {
         return enrollmentService.updateEnrollment(id, request, authentication);
     }
-    
+
 }

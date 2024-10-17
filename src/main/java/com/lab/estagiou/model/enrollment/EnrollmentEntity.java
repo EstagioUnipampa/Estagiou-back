@@ -76,18 +76,18 @@ public class EnrollmentEntity implements Serializable {
             throw new RegisterException("Id da vaga não pode ser nulo");
         }
 
-        if (request.getFile() == null) {
-            throw new RegisterException("Arquivo não pode ser nulo");
-        }
-        
-        try {
-            if (request.getFile().get(0).getBytes().length == 0) {
-                throw new RegisterException("Arquivo não pode ser vazio");
-            }
-            this.file = request.getFile().get(0).getBytes();
-        } catch (IOException e) {
-            throw new RegisterException("Erro ao tentar ler o arquivo");
-        }
+        // if (request.getFile() == null) {
+        // throw new RegisterException("Arquivo não pode ser nulo");
+        // }
+
+        // try {
+        // if (request.getFile().get(0).getBytes().length == 0) {
+        // throw new RegisterException("Arquivo não pode ser vazio");
+        // }
+        // this.file = request.getFile().get(0).getBytes();
+        // } catch (IOException e) {
+        // throw new RegisterException("Erro ao tentar ler o arquivo");
+        // }
 
         this.student = student;
         this.jobVacancy = jobVacancy;
@@ -100,18 +100,18 @@ public class EnrollmentEntity implements Serializable {
             throw new UpdateException("Request cannot be null");
         }
 
-        if (request.getFile() == null) {
-            throw new RegisterException("Arquivo não pode ser nulo");
-        }
-        
-        try {
-            if (request.getFile().get(0).getBytes().length == 0) {
-                throw new RegisterException("Arquivo não pode ser vazio");
-            }
-            this.file = request.getFile().get(0).getBytes();
-        } catch (IOException e) {
-            throw new RegisterException("Erro ao tentar ler o arquivo");
-        }
+        // if (request.getFile() == null) {
+        // throw new RegisterException("Arquivo não pode ser nulo");
+        // }
+
+        // try {
+        // if (request.getFile().get(0).getBytes().length == 0) {
+        // throw new RegisterException("Arquivo não pode ser vazio");
+        // }
+        // this.file = request.getFile().get(0).getBytes();
+        // } catch (IOException e) {
+        // throw new RegisterException("Erro ao tentar ler o arquivo");
+        // }
 
         this.updatedAt = Instant.now();
     }
@@ -137,5 +137,5 @@ public class EnrollmentEntity implements Serializable {
 
         return this.student.equals(user);
     }
-    
+
 }

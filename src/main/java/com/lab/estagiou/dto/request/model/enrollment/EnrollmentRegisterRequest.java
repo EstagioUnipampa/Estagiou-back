@@ -13,6 +13,6 @@ public class EnrollmentRegisterRequest {
     private UUID studentId;
     private UUID jobVacancyId;
 
-    private List<MultipartFile> file;
-    
+    // private List<MultipartFile> file;
+
 }
