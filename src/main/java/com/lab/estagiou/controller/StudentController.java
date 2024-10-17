@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.lab.estagiou.controller.util.UtilController;
 import com.lab.estagiou.dto.request.model.student.StudentRegisterRequest;
 import com.lab.estagiou.dto.response.error.ErrorResponse;
+import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.student.StudentEntity;
 import com.lab.estagiou.service.StudentService;
 
@@ -63,6 +65,21 @@ public class StudentController {
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StudentEntity>> listStudents(Authentication authentication) {
         return studentService.listStudents();
+    }
+
+    @Operation(summary = "Search student by ID", description = "Search a student by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Student found successfully", content = @Content(schema = @Schema(implementation = StudentEntity.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Student not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @GetMapping(path = "/profile")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT')")
+    public ResponseEntity<Object> searchStudentProfile(@AuthenticationPrincipal JwtUserDetails userDetails) {
+
+        return studentService.searchStudentById(userDetails.getId());
     }
 
     @Operation(summary = "Search student by ID", description = "Search a student by ID")
