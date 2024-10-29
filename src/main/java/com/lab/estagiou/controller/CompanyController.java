@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,8 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.lab.estagiou.controller.util.UtilController;
 import com.lab.estagiou.dto.request.model.company.CompanyRegisterRequest;
+import com.lab.estagiou.dto.response.company.CompanyResponse;
 import com.lab.estagiou.dto.response.error.ErrorResponse;
+import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.company.CompanyEntity;
+import com.lab.estagiou.model.student.StudentEntity;
 import com.lab.estagiou.service.CompanyService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,8 +80,23 @@ public class CompanyController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(path = "/{id}")
-    public ResponseEntity<CompanyEntity> searchCompanyById(@PathVariable UUID id) {
-        return companyService.searchCompanyById(id);
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT')")
+    public ResponseEntity<CompanyResponse> searchCompanyById(@PathVariable UUID id) {
+        return ResponseEntity.ok(new CompanyResponse(companyService.searchCompanyById(id)));
+    }
+
+    @Operation(summary = "Search student by ID", description = "Search a student by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Student found successfully", content = @Content(schema = @Schema(implementation = StudentEntity.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Student not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @GetMapping(path = "/profile")
+    @PreAuthorize("hasAnyRole('ROLE_COMPANY')")
+    public ResponseEntity<CompanyResponse> searchStudentProfile(@AuthenticationPrincipal JwtUserDetails userDetails) {
+        return ResponseEntity.ok(new CompanyResponse(companyService.searchCompanyById(userDetails.getId())));
     }
 
     @Operation(summary = "Delete company by ID", description = "Delete a company by ID")

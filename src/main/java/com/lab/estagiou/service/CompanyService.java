@@ -75,13 +75,11 @@ public class CompanyService {
         return ResponseEntity.ok(companies);
     }
 
-    public ResponseEntity<CompanyEntity> searchCompanyById(UUID id) {
+    public CompanyEntity searchCompanyById(UUID id) {
         CompanyEntity company = companyRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(COMPANY_NOT_FOUND + id));
 
-        // log(LogEnum.INFO, "Company found: " + company.getEmail(),
-        // HttpStatus.OK.value());
-        return ResponseEntity.ok(company);
+        return company;
     }
 
     public ResponseEntity<Object> deleteCompanyById(UUID id, Authentication authentication) {

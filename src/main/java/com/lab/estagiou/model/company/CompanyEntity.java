@@ -42,7 +42,6 @@ public class CompanyEntity extends UserEntity {
     private String accountableName;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference
     private List<JobVacancyEntity> jobVacancies = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.PERSIST)

@@ -74,7 +74,6 @@ public class StudentService {
     }
 
     public ResponseEntity<Object> searchStudentById(UUID id) {
-
         StudentEntity student = studentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(STUDENT_NOT_FOUND + id));
 
