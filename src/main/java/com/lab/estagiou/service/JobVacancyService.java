@@ -52,16 +52,14 @@ public class JobVacancyService {
         return ResponseEntity.created(location).build();
     }
 
-    public ResponseEntity<List<JobVacancyEntity>> listJobVacancies() {
+    public List<JobVacancyEntity> listJobVacancies() {
         List<JobVacancyEntity> jobVacancies = jobVacancyRepository.findAll();
 
         if (jobVacancies.isEmpty()) {
             throw new NoContentException("No job vacancies registered");
         }
 
-        // log(LogEnum.INFO, "List job vacancies: " + jobVacancies.size() + " job
-        // vacancies", HttpStatus.OK.value());
-        return ResponseEntity.ok(jobVacancies);
+        return jobVacancies;
     }
 
     public ResponseEntity<JobVacancyEntity> searchJobVacancyById(UUID id) {

@@ -1,15 +1,10 @@
-package com.lab.estagiou.dto.response.job_vacancy;
-
-import java.util.List;
+package com.lab.estagiou.dto.response.company;
 
 import java.util.UUID;
 
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.stream.Collectors;
 
 @Data
 public class JobVacancyResponse {
@@ -21,7 +16,6 @@ public class JobVacancyResponse {
     private String salary;
     private String hours;
     private String modality;
-    private CompanyResponse company;
 
     public JobVacancyResponse(JobVacancyEntity entity) {
         this.id = entity.getId();
@@ -31,11 +25,6 @@ public class JobVacancyResponse {
         this.salary = entity.getSalary();
         this.hours = entity.getHours();
         this.modality = entity.getModality();
-        this.company = new CompanyResponse(entity.getCompany());
-    }
-
-    public static List<JobVacancyResponse> fromEntityList(List<JobVacancyEntity> jobVacancies) {
-        return jobVacancies.stream().map(JobVacancyResponse::new).collect(Collectors.toList());
     }
 
 }

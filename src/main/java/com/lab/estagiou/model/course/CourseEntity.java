@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lab.estagiou.model.student.StudentEntity;
 
 import jakarta.persistence.Entity;
@@ -37,6 +38,7 @@ public class CourseEntity implements Serializable {
     private String name;
 
     @OneToMany(mappedBy = "course")
+    @JsonIgnore
     private List<StudentEntity> students;
 
     private static final String STUDENT_NULL = "Aluno não pode ser nulo";
@@ -86,5 +88,5 @@ public class CourseEntity implements Serializable {
     public boolean isEmpty() {
         return this.students.isEmpty();
     }
-    
+
 }

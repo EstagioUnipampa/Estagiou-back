@@ -13,6 +13,8 @@ import com.lab.estagiou.model.admin.AdminEntity;
 import com.lab.estagiou.model.admin.AdminRepository;
 import com.lab.estagiou.model.company.CompanyEntity;
 import com.lab.estagiou.model.company.CompanyRepository;
+import com.lab.estagiou.model.course.CourseEntity;
+import com.lab.estagiou.model.course.CourseRepository;
 import com.lab.estagiou.model.enrollment.EnrollmentEntity;
 import com.lab.estagiou.model.enrollment.EnrollmentRepository;
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
@@ -41,12 +43,20 @@ public class SeedDatabase implements CommandLineRunner {
     @Autowired
     private EnrollmentRepository enrollmentRepository;
 
+    @Autowired
+    private CourseRepository courseRepository;
+
     @Override
     public void run(String... args) throws Exception {
-        StudentEntity student1 = new StudentEntity("Ricardo", "Costa", "ricardo@gmail.com", "123456");
-        StudentEntity student2 = new StudentEntity("João", "Medina", "joao@gmail.com", "123456");
-        StudentEntity student3 = new StudentEntity("Tales", "Soares", "tales@gmail.com", "123456");
-        StudentEntity student4 = new StudentEntity("Emanuel", "Rosa", "emanuel@gmail.com", "123456");
+        CourseEntity course1 = new CourseEntity("Engenharia de Software");
+        CourseEntity course2 = new CourseEntity("Ciência da Computação");
+
+        courseRepository.saveAll(Arrays.asList(course1, course2));
+
+        StudentEntity student1 = new StudentEntity("Ricardo", "Costa", "ricardo@gmail.com", "123456", course1);
+        StudentEntity student2 = new StudentEntity("João", "Medina", "joao@gmail.com", "123456", course2);
+        StudentEntity student3 = new StudentEntity("Tales", "Soares", "tales@gmail.com", "123456", course1);
+        StudentEntity student4 = new StudentEntity("Emanuel", "Rosa", "emanuel@gmail.com", "123456", course2);
 
         studentRepository.saveAll(Arrays.asList(student1, student2, student3, student4));
 
@@ -158,8 +168,9 @@ public class SeedDatabase implements CommandLineRunner {
         JobVacancyEntity jobVacancy9 = new JobVacancyEntity(jobVacancyRegisterRequest9, company1);
         JobVacancyEntity jobVacancy10 = new JobVacancyEntity(jobVacancyRegisterRequest10, company1);
 
-        jobVacancyRepository.saveAll(Arrays.asList(jobVacancy1, jobVacancy2, jobVacancy3, jobVacancy4, jobVacancy5,
-                jobVacancy6, jobVacancy7, jobVacancy8, jobVacancy9, jobVacancy10));
+        jobVacancyRepository
+                .saveAll(Arrays.asList(jobVacancy1, jobVacancy2, jobVacancy3, jobVacancy4, jobVacancy5,
+                        jobVacancy6, jobVacancy7, jobVacancy8, jobVacancy9, jobVacancy10));
 
         EnrollmentRegisterRequest enrollmentRegisterRequest1 = new EnrollmentRegisterRequest();
         enrollmentRegisterRequest1.setStudentId(student1.getId());

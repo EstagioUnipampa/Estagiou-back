@@ -44,6 +44,7 @@ public class StudentEntity extends UserEntity {
     private CourseEntity course;
 
     @OneToMany(mappedBy = "student")
+    @JsonIgnore
     private List<EnrollmentEntity> enrollments;
 
     @OneToOne(cascade = CascadeType.PERSIST)
@@ -54,7 +55,7 @@ public class StudentEntity extends UserEntity {
 
     private static final String EXPECTED_DOMAIN = "@gmail.com";
 
-    public StudentEntity(String name, String lastName, String email, String password) {
+    public StudentEntity(String name, String lastName, String email, String password, CourseEntity course) {
         super(null, name, email, password, Role.ROLE_STUDENT);
 
         if (name == null || name.isBlank()) {
@@ -69,10 +70,11 @@ public class StudentEntity extends UserEntity {
 
         this.lastName = lastName;
         this.enrollments = new ArrayList<>();
+        this.course = course;
     }
 
     public StudentEntity(StudentRegisterRequest request) {
-        this(request.getName(), request.getLastName(), request.getEmail(), request.getPassword());
+        this(request.getName(), request.getLastName(), request.getEmail(), request.getPassword(), null);
     }
 
     public void validStudentEmail(String email) {
