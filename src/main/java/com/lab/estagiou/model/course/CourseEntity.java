@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lab.estagiou.model.skill.SkillEntity;
 import com.lab.estagiou.model.student.StudentEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,13 +39,17 @@ public class CourseEntity implements Serializable {
 
     private String name;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.PERSIST)
     @JsonIgnore
     private List<StudentEntity> students;
 
+    @OneToMany(mappedBy = "course")
+    @JsonIgnore
+    private List<SkillEntity> skills;
+
     private static final String STUDENT_NULL = "Aluno não pode ser nulo";
 
-    public CourseEntity(String name) {
+    public CourseEntity(String name, List<SkillEntity> skills) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Nome do curso não pode ser nulo");
         }
@@ -51,6 +57,7 @@ public class CourseEntity implements Serializable {
         this.id = null;
         this.name = name;
         this.students = new ArrayList<>();
+        this.skills = skills;
     }
 
     public boolean equalsName(String name) {
