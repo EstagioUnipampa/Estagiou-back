@@ -13,6 +13,7 @@ import com.lab.estagiou.exception.generic.UpdateException;
 import com.lab.estagiou.model.address.AddressEntity;
 import com.lab.estagiou.model.course.CourseEntity;
 import com.lab.estagiou.model.enrollment.EnrollmentEntity;
+import com.lab.estagiou.model.skill.SkillEntity;
 import com.lab.estagiou.model.user.UserEntity;
 import com.lab.estagiou.model.user.UserRoleEnum;
 
@@ -20,6 +21,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -50,6 +52,10 @@ public class StudentEntity extends UserEntity {
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "address_id", nullable = true)
     private AddressEntity address;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "students")
+    private List<SkillEntity> skills;
 
     private static final String ENROLLMENT_NULL = "Inscrição não pode ser nula";
 

@@ -32,6 +32,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping(value = UtilController.API_VERSION + "/student", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,8 +51,8 @@ public class StudentController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/register")
-    public ResponseEntity<Object> registerStudent(@RequestBody StudentRegisterRequest request) {
-        return studentService.registerStudent(new StudentEntity(request));
+    public ResponseEntity<Object> registerStudent(@RequestBody @Valid StudentRegisterRequest request) {
+        return studentService.registerStudent(new StudentEntity(request), request);
     }
 
     @Operation(summary = "List students", description = "List all students")

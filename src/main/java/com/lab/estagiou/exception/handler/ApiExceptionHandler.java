@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.lab.estagiou.exception.generic.EmailAlreadyRegisteredException;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,15 @@ public class ApiExceptionHandler {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .body(new ErrorMessage(request, HttpStatus.CONFLICT, e.getMessage()));
+        }
+
+        @ExceptionHandler(EntityNotFoundException.class)
+        public ResponseEntity<ErrorMessage> entityNotFound(RuntimeException e,
+                        HttpServletRequest request) {
+                log.error("Api error - {}", e.getMessage());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(new ErrorMessage(request, HttpStatus.NOT_FOUND, e.getMessage()));
         }
 
         @ExceptionHandler(AccessDeniedException.class)
