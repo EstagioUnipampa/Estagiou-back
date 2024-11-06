@@ -100,21 +100,21 @@ public class StudentService {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<List<StudentEntity>> listStudents() {
+    public List<StudentEntity> listStudents() {
         List<StudentEntity> students = studentRepository.findAll();
 
         if (students.isEmpty()) {
             throw new NoContentException("No students registered");
         }
 
-        return ResponseEntity.ok(students);
+        return students;
     }
 
-    public ResponseEntity<Object> searchStudentById(UUID id) {
+    public StudentEntity searchStudentById(UUID id) {
         StudentEntity student = studentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(STUDENT_NOT_FOUND + id));
 
-        return ResponseEntity.ok(student);
+        return student;
     }
 
     public ResponseEntity<Object> deleteStudentById(UUID id, Authentication authentication) {

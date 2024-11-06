@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.lab.estagiou.controller.util.UtilController;
 import com.lab.estagiou.dto.request.model.student.StudentRegisterRequest;
 import com.lab.estagiou.dto.response.error.ErrorResponse;
+import com.lab.estagiou.dto.response.student.StudentResponseDto;
 import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.student.StudentEntity;
 import com.lab.estagiou.service.StudentService;
@@ -64,8 +65,11 @@ public class StudentController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<StudentEntity>> listStudents(Authentication authentication) {
-        return studentService.listStudents();
+    public ResponseEntity<List<StudentResponseDto>> listStudents(Authentication authentication) {
+        List<StudentEntity> students = studentService.listStudents();
+        List<StudentResponseDto> studentsDto = StudentResponseDto.toDto(students);
+
+        return ResponseEntity.ok(studentsDto);
     }
 
     @Operation(summary = "Search student by ID", description = "Search a student by ID")
@@ -78,9 +82,11 @@ public class StudentController {
     })
     @GetMapping(path = "/profile")
     @PreAuthorize("hasAnyRole('ROLE_STUDENT')")
-    public ResponseEntity<Object> searchStudentProfile(@AuthenticationPrincipal JwtUserDetails userDetails) {
+    public ResponseEntity<StudentResponseDto> searchStudentProfile(
+            @AuthenticationPrincipal JwtUserDetails userDetails) {
+        StudentEntity studentEntity = studentService.searchStudentById(userDetails.getId());
 
-        return studentService.searchStudentById(userDetails.getId());
+        return ResponseEntity.ok(new StudentResponseDto(studentEntity));
     }
 
     @Operation(summary = "Search student by ID", description = "Search a student by ID")
@@ -94,7 +100,9 @@ public class StudentController {
     @GetMapping(path = "/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_COMPANY')")
     public ResponseEntity<Object> searchStudentById(@PathVariable UUID id) {
-        return studentService.searchStudentById(id);
+        StudentEntity studentEntity = studentService.searchStudentById(id);
+
+        return ResponseEntity.ok(new StudentResponseDto(studentEntity));
     }
 
     @Operation(summary = "Delete student by ID", description = "Delete a student by ID")
