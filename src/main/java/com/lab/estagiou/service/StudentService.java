@@ -17,7 +17,6 @@ import org.springframework.security.crypto.keygen.BytesKeyGenerator;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 
-import com.lab.estagiou.dto.request.model.student.SkillsRequestDto;
 import com.lab.estagiou.dto.request.model.student.StudentRegisterRequest;
 import com.lab.estagiou.exception.generic.EmailAlreadyRegisteredException;
 import com.lab.estagiou.exception.generic.NoContentException;
@@ -68,13 +67,13 @@ public class StudentService {
         student.setCourse(courseEntity);
 
         if (request.getSkills() != null || !request.getSkills().isEmpty()) {
-            List<SkillsRequestDto> skillsIdDto = request.getSkills();
+            List<UUID> skillsIdDto = request.getSkills();
 
             AtomicReference<StudentEntity> studentAtomic = new AtomicReference<>(student);
 
             List<SkillEntity> skills = skillsIdDto.stream()
                     .map(skill -> {
-                        SkillEntity skillEntity = skillRepository.findById(skill.getId())
+                        SkillEntity skillEntity = skillRepository.findById(skill)
                                 .orElseThrow(() -> new EntityNotFoundException("Skill inexistente"));
                         skillEntity.addStudent(studentAtomic.get());
                         return skillEntity;
