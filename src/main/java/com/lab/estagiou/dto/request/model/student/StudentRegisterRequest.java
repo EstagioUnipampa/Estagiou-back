@@ -17,6 +17,6 @@ public class StudentRegisterRequest extends RequestEmailAddressRegister {
     private UUID course;
 
     @Size(max = 5)
-    private List<SkillsRequestDto> skills;
+    private List<UUID> skills;
 
 }
