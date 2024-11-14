@@ -1,8 +1,8 @@
 package com.lab.estagiou.controller;
 
-import java.util.UUID;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,16 +13,17 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.lab.estagiou.controller.util.UtilController;
+import com.lab.estagiou.dto.request.model.enrollment.EnrollmentPatchRequest;
 import com.lab.estagiou.dto.request.model.enrollment.EnrollmentRegisterRequest;
 import com.lab.estagiou.dto.response.enrollment.EnrollmentResponse;
+import com.lab.estagiou.dto.response.enrollment.ResponseStatusDecided;
 import com.lab.estagiou.dto.response.error.ErrorResponse;
 import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.enrollment.EnrollmentEntity;
@@ -135,19 +136,27 @@ public class EnrollmentController {
                 return enrollmentService.deleteEnrollmentById(id, authentication);
         }
 
-        @Operation(summary = "Update enrollment", description = "Update an enrollment")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "204", description = "Enrollment updated successfully", content = @Content),
-                        @ApiResponse(responseCode = "400", description = "Incorrect atributtes", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                        @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                        @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                        @ApiResponse(responseCode = "404", description = "Enrollment not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-        })
-        @PutMapping("/{id}")
-        public ResponseEntity<Object> updateEnrollment(@PathVariable UUID id,
-                        @ModelAttribute EnrollmentRegisterRequest request, Authentication authentication) {
-                return enrollmentService.updateEnrollment(id, request, authentication);
+        @PatchMapping("/{idVacancy}/{idStudent}")
+        @PreAuthorize("hasAnyRole('ROLE_COMPANY')")
+        public ResponseEntity<EnrollmentResponse> updateEnrollmentStatus(@PathVariable UUID idVacancy,
+                        @PathVariable UUID idStudent,
+                        @RequestBody EnrollmentPatchRequest request) {
+
+                EnrollmentEntity enrollmentEntity = enrollmentService.updateEnrollmentStatus(idVacancy, idStudent,
+                                request.isStatus());
+                EnrollmentResponse enrollmentResponse = new EnrollmentResponse(enrollmentEntity);
+
+                return ResponseEntity.ok(enrollmentResponse);
+        }
+
+        @GetMapping("/statusdecided/{idVacancy}/{idStudent}")
+        @PreAuthorize("hasAnyRole('ROLE_COMPANY')")
+        public ResponseEntity<ResponseStatusDecided> getStatusDecided(@PathVariable UUID idVacancy,
+                        @PathVariable UUID idStudent) {
+
+                boolean statusDecided = enrollmentService.statusDecided(idVacancy, idStudent);
+
+                return ResponseEntity.ok(new ResponseStatusDecided(statusDecided));
         }
 
 }

@@ -1,6 +1,7 @@
 package com.lab.estagiou.dto.response.job_vacancy;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;

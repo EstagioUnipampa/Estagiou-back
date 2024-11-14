@@ -17,6 +17,7 @@ import com.lab.estagiou.exception.generic.RegisterException;
 import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.enrollment.EnrollmentEntity;
 import com.lab.estagiou.model.enrollment.EnrollmentRepository;
+import com.lab.estagiou.model.enrollment.EnrollmentEntity.Status;
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 import com.lab.estagiou.model.jobvacancy.JobVacancyRepository;
 import com.lab.estagiou.model.student.StudentEntity;
@@ -132,6 +133,41 @@ public class EnrollmentService {
 
     public boolean isEnroll(UUID id, UUID id2) {
         return enrollmentRepository.existsByStudentIdAndJobVacancyId(id, id2);
+    }
+
+    public EnrollmentEntity updateEnrollmentStatus(UUID idVacancy, UUID idStudent, boolean approved) {
+        StudentEntity student = studentRepository.findById(idStudent)
+                .orElseThrow(() -> new NotFoundException("Student not found"));
+
+        JobVacancyEntity jobVacancy = jobVacancyRepository.findById(idVacancy)
+                .orElseThrow(() -> new NotFoundException("Job vacancy not found"));
+
+        EnrollmentEntity enrollment = enrollmentRepository.findByStudentAndJobVacancy(student, jobVacancy)
+                .orElseThrow(() -> new NotFoundException("Enrollment not found"));
+
+        if (approved) {
+            enrollment.setStatus(Status.APROVADO);
+        } else {
+            enrollment.setStatus(Status.REJEITADO);
+        }
+
+        return enrollmentRepository.save(enrollment);
+    }
+
+    public boolean statusDecided(UUID idVacancy, UUID idStudent) {
+        StudentEntity student = studentRepository.findById(idStudent)
+                .orElseThrow(() -> new NotFoundException("Student not found"));
+
+        JobVacancyEntity jobVacancy = jobVacancyRepository.findById(idVacancy)
+                .orElseThrow(() -> new NotFoundException("Job vacancy not found"));
+
+        EnrollmentEntity enrollment = enrollmentRepository.findByStudentAndJobVacancy(student, jobVacancy)
+                .orElseThrow(() -> new NotFoundException("Enrollment not found"));
+
+        if (enrollment.getStatus() == Status.APROVADO || enrollment.getStatus() == Status.REJEITADO) {
+            return true;
+        }
+        return false;
     }
 
 }
