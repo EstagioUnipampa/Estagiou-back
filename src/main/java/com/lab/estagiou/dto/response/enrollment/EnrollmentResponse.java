@@ -29,4 +29,8 @@ public class EnrollmentResponse {
         return enrollments.stream().map(EnrollmentResponse::new).toList();
     }
 
+    public static List<EnrollmentResponse> convertList(List<EnrollmentEntity> enrollments, boolean isEnroll) {
+        return enrollments.stream().map(enrollment -> new EnrollmentResponse(enrollment, isEnroll)).toList();
+    }
+
 }

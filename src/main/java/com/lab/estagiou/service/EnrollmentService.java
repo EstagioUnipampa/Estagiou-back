@@ -127,10 +127,7 @@ public class EnrollmentService {
     }
 
     public List<EnrollmentEntity> searchStudentsEnrollmentsById(UUID id) {
-
-        List<EnrollmentEntity> enrollments = enrollmentRepository.findByStudentId(id);
-
-        return enrollments;
+        return enrollmentRepository.findByStudentId(id);
     }
 
     public boolean isEnroll(UUID id, UUID id2) {
