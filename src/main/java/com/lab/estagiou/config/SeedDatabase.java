@@ -199,7 +199,7 @@ public class SeedDatabase implements CommandLineRunner {
                 jobVacancyRegisterRequest6.setModality("Remoto");
 
                 JobVacancyRegisterRequest jobVacancyRegisterRequest7 = new JobVacancyRegisterRequest();
-                jobVacancyRegisterRequest7.setTitle("Especialista em Segurança da Informação");
+                jobVacancyRegisterRequest7.setTitle("Especialista em Segurança");
                 jobVacancyRegisterRequest7.setRole("Segurança cibernética");
                 jobVacancyRegisterRequest7.setDescription("Gestão e implementação de segurança da informação");
                 jobVacancyRegisterRequest7.setSalary("6000.0");
