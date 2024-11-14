@@ -1,11 +1,10 @@
 package com.lab.estagiou.service;
 
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -13,12 +12,15 @@ import org.springframework.stereotype.Service;
 import com.lab.estagiou.dto.request.model.jobvacancy.JobVacancyRegisterRequest;
 import com.lab.estagiou.exception.generic.NoContentException;
 import com.lab.estagiou.exception.generic.NotFoundException;
-import com.lab.estagiou.exception.generic.UnauthorizedUserException;
+import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.company.CompanyEntity;
+import com.lab.estagiou.model.company.CompanyRepository;
+import com.lab.estagiou.model.course.CourseEntity;
+import com.lab.estagiou.model.course.CourseRepository;
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 import com.lab.estagiou.model.jobvacancy.JobVacancyRepository;
-import com.lab.estagiou.model.log.LogEnum;
-import com.lab.estagiou.model.user.UserEntity;
+import com.lab.estagiou.model.skill.SkillEntity;
+import com.lab.estagiou.model.skill.SkillRepository;
 
 @Service
 public class JobVacancyService {
@@ -26,30 +28,37 @@ public class JobVacancyService {
     @Autowired
     private JobVacancyRepository jobVacancyRepository;
 
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private SkillRepository skillRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
+
     private static final String JOB_VACANCY_NOT_FOUND = "Job Vacancy not found: ";
 
-    public ResponseEntity<JobVacancyEntity> registerJobVacancy(JobVacancyRegisterRequest request,
-            Authentication authentication) {
-        // if (authentication == null) {
-        // throw new UnauthorizedUserException(UNAUTHORIZED_ACESS_ATTEMPT);
-        // }
+    public JobVacancyEntity registerJobVacancy(JobVacancyRegisterRequest request, JwtUserDetails user) {
+        CompanyEntity company = companyRepository.findById(user.getId())
+                .orElseThrow(() -> new NotFoundException("Company not found: " + user.getId()));
 
-        UserEntity user = (UserEntity) authentication.getPrincipal();
+        List<SkillEntity> skillEntities = skillRepository.findAllById(request.getSkills());
+        CourseEntity course = courseRepository.findById(request.getCourse())
+                .orElseThrow(() -> new NotFoundException("Course not found: " + request.getCourse()));
 
-        // if (!(user instanceof CompanyEntity)) {
-        // throw new UnauthorizedUserException(UNAUTHORIZED_ACESS_ATTEMPT_DOTS +
-        // user.getId());
-        // }
+        JobVacancyEntity jobVacancy = new JobVacancyEntity(request, company, skillEntities, course);
 
-        CompanyEntity company = (CompanyEntity) user;
-        JobVacancyEntity jobVacancy = new JobVacancyEntity(request, company);
-        jobVacancyRepository.save(jobVacancy);
+        jobVacancy = jobVacancyRepository.save(jobVacancy);
 
-        URI location = URI.create("/jobvacancy/" + jobVacancy.getId());
+        List<SkillEntity> skillsSave = new ArrayList<>();
+        for (SkillEntity skill : skillEntities) {
+            skill.addJobVacancy(jobVacancy);
+            skillsSave.add(skill);
+        }
+        skillRepository.saveAll(skillsSave);
 
-        // log(LogEnum.INFO, "Job vacancy registered: " + jobVacancy.getId(),
-        // HttpStatus.OK.value());
-        return ResponseEntity.created(location).build();
+        return jobVacancy;
     }
 
     public List<JobVacancyEntity> listJobVacancies() {
@@ -62,13 +71,11 @@ public class JobVacancyService {
         return jobVacancies;
     }
 
-    public ResponseEntity<JobVacancyEntity> searchJobVacancyById(UUID id) {
+    public JobVacancyEntity searchJobVacancyById(UUID id) {
         JobVacancyEntity jobVacancy = jobVacancyRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(JOB_VACANCY_NOT_FOUND + id));
 
-        // log(LogEnum.INFO, "Job Vacancy found: " + jobVacancy.getId(),
-        // HttpStatus.OK.value());
-        return ResponseEntity.ok(jobVacancy);
+        return jobVacancy;
     }
 
     public ResponseEntity<Object> deleteJobVacancyById(UUID id, Authentication authentication) {

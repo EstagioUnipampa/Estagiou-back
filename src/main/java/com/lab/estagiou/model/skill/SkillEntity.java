@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.lab.estagiou.model.course.CourseEntity;
+import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 import com.lab.estagiou.model.student.StudentEntity;
 
 import jakarta.persistence.Entity;
@@ -46,6 +47,10 @@ public class SkillEntity implements Serializable {
     @JoinTable(name = "tb_student_skill", joinColumns = @JoinColumn(name = "skill_id"), inverseJoinColumns = @JoinColumn(name = "student_id"))
     private List<StudentEntity> students;
 
+    @ManyToMany
+    @JoinTable(name = "tb_job_vacancy_skill", joinColumns = @JoinColumn(name = "skill_id"), inverseJoinColumns = @JoinColumn(name = "job_vacancy_id"))
+    private List<JobVacancyEntity> jobVacancies;
+
     public SkillEntity(String name) {
         this.name = name;
     }
@@ -56,6 +61,13 @@ public class SkillEntity implements Serializable {
         }
         students.add(entity);
         return this;
+    }
+
+    public void addJobVacancy(JobVacancyEntity jobVacancy) {
+        if (jobVacancies == null) {
+            jobVacancies = new ArrayList<>();
+        }
+        jobVacancies.add(jobVacancy);
     }
 
 }

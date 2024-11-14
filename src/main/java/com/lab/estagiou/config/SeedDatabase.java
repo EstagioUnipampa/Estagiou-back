@@ -1,6 +1,5 @@
 package com.lab.estagiou.config;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -209,20 +208,63 @@ public class SeedDatabase implements CommandLineRunner {
                 jobVacancyRegisterRequest10.setHours("40");
                 jobVacancyRegisterRequest10.setModality("Híbrido");
 
-                JobVacancyEntity jobVacancy1 = new JobVacancyEntity(jobVacancyRegisterRequest1, company1);
-                JobVacancyEntity jobVacancy2 = new JobVacancyEntity(jobVacancyRegisterRequest2, company1);
-                JobVacancyEntity jobVacancy3 = new JobVacancyEntity(jobVacancyRegisterRequest3, company1);
-                JobVacancyEntity jobVacancy4 = new JobVacancyEntity(jobVacancyRegisterRequest4, company1);
-                JobVacancyEntity jobVacancy5 = new JobVacancyEntity(jobVacancyRegisterRequest5, company1);
-                JobVacancyEntity jobVacancy6 = new JobVacancyEntity(jobVacancyRegisterRequest6, company1);
-                JobVacancyEntity jobVacancy7 = new JobVacancyEntity(jobVacancyRegisterRequest7, company1);
-                JobVacancyEntity jobVacancy8 = new JobVacancyEntity(jobVacancyRegisterRequest8, company1);
-                JobVacancyEntity jobVacancy9 = new JobVacancyEntity(jobVacancyRegisterRequest9, company1);
-                JobVacancyEntity jobVacancy10 = new JobVacancyEntity(jobVacancyRegisterRequest10, company1);
+                List<SkillEntity> skills = skillsES.subList(0, 4);
+                SkillEntity skill1 = skills.get(0);
+                SkillEntity skill2 = skills.get(1);
+                SkillEntity skill3 = skills.get(2);
+                SkillEntity skill4 = skills.get(3);
 
-                jobVacancyRepository
+                JobVacancyEntity jobVacancy1 = new JobVacancyEntity(jobVacancyRegisterRequest1, company1,
+                                Arrays.asList(skill1, skill2, skill3, skill4),
+                                course1);
+
+                JobVacancyEntity jobVacancy2 = new JobVacancyEntity(jobVacancyRegisterRequest2, company1,
+                                Arrays.asList(skill1, skill2, skill3,
+                                                skill4),
+                                course1);
+                JobVacancyEntity jobVacancy3 = new JobVacancyEntity(jobVacancyRegisterRequest3, company1,
+                                Arrays.asList(skill1, skill2, skill3,
+                                                skill4),
+                                course1);
+                JobVacancyEntity jobVacancy4 = new JobVacancyEntity(jobVacancyRegisterRequest4, company1,
+                                Arrays.asList(skill1, skill2, skill3,
+                                                skill4),
+                                course1);
+                JobVacancyEntity jobVacancy5 = new JobVacancyEntity(jobVacancyRegisterRequest5, company1,
+                                Arrays.asList(skill1, skill2, skill3,
+                                                skill4),
+                                course1);
+                JobVacancyEntity jobVacancy6 = new JobVacancyEntity(jobVacancyRegisterRequest6, company1,
+                                Arrays.asList(skill1, skill2, skill3,
+                                                skill4),
+                                course1);
+                JobVacancyEntity jobVacancy7 = new JobVacancyEntity(jobVacancyRegisterRequest7, company1,
+                                Arrays.asList(skill1, skill2, skill3,
+                                                skill4),
+                                course1);
+                JobVacancyEntity jobVacancy8 = new JobVacancyEntity(jobVacancyRegisterRequest8, company1,
+                                Arrays.asList(skill1, skill2, skill3,
+                                                skill4),
+                                course1);
+                JobVacancyEntity jobVacancy9 = new JobVacancyEntity(jobVacancyRegisterRequest9, company1,
+                                Arrays.asList(skill1, skill2, skill3,
+                                                skill4),
+                                course1);
+                JobVacancyEntity jobVacancy10 = new JobVacancyEntity(jobVacancyRegisterRequest10, company1,
+                                Arrays.asList(skill1, skill2, skill3,
+                                                skill4),
+                                course1);
+
+                List<JobVacancyEntity> jobVacancyEntities = jobVacancyRepository
                                 .saveAll(Arrays.asList(jobVacancy1, jobVacancy2, jobVacancy3, jobVacancy4, jobVacancy5,
                                                 jobVacancy6, jobVacancy7, jobVacancy8, jobVacancy9, jobVacancy10));
+
+                skill1.setJobVacancies(jobVacancyEntities);
+                skill2.setJobVacancies(jobVacancyEntities);
+                skill3.setJobVacancies(jobVacancyEntities);
+                skill4.setJobVacancies(jobVacancyEntities);
+
+                skillRepository.saveAll(Arrays.asList(skill1, skill2, skill3, skill4));
 
                 EnrollmentRegisterRequest enrollmentRegisterRequest1 = new EnrollmentRegisterRequest();
                 enrollmentRegisterRequest1.setStudentId(student1.getId());

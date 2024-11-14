@@ -1,12 +1,15 @@
 package com.lab.estagiou.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +23,7 @@ import com.lab.estagiou.controller.util.UtilController;
 import com.lab.estagiou.dto.request.model.jobvacancy.JobVacancyRegisterRequest;
 import com.lab.estagiou.dto.response.error.ErrorResponse;
 import com.lab.estagiou.dto.response.job_vacancy.JobVacancyResponse;
+import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 import com.lab.estagiou.service.JobVacancyService;
 
@@ -45,10 +49,14 @@ public class JobVacancyController {
             @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping("/register")
-    public ResponseEntity<JobVacancyEntity> registerJobVacancy(@RequestBody JobVacancyRegisterRequest request,
-            Authentication authentication) {
-        return jobVacancyService.registerJobVacancy(request, authentication);
+    @PreAuthorize("hasRole('ROLE_COMPANY')")
+    @PostMapping
+    public ResponseEntity<JobVacancyResponse> registerJobVacancy(@RequestBody JobVacancyRegisterRequest request,
+            @AuthenticationPrincipal JwtUserDetails jwtUserDetails) {
+        JobVacancyEntity jobVacancyEntity = jobVacancyService.registerJobVacancy(request, jwtUserDetails);
+        JobVacancyResponse response = new JobVacancyResponse(jobVacancyEntity);
+
+        return ResponseEntity.created(URI.create("/jobvacancy/" + response.getId())).body(response);
     }
 
     @Operation(summary = "List job vacancies", description = "List all job vacancies")
@@ -76,8 +84,11 @@ public class JobVacancyController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/{id}")
-    public ResponseEntity<JobVacancyEntity> searchJobVacancyById(@PathVariable UUID id) {
-        return jobVacancyService.searchJobVacancyById(id);
+    public ResponseEntity<JobVacancyResponse> searchJobVacancyById(@PathVariable UUID id) {
+        JobVacancyEntity jobVacancy = jobVacancyService.searchJobVacancyById(id);
+        JobVacancyResponse response = new JobVacancyResponse(jobVacancy);
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Delete job vacancy by ID", description = "Delete a job vacancy by ID")

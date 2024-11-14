@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 import com.lab.estagiou.model.skill.SkillEntity;
 import com.lab.estagiou.model.student.StudentEntity;
 
@@ -46,6 +47,10 @@ public class CourseEntity implements Serializable {
     @OneToMany(mappedBy = "course")
     @JsonIgnore
     private List<SkillEntity> skills;
+
+    @OneToMany(mappedBy = "course")
+    @JsonIgnore
+    private List<JobVacancyEntity> jobVacancies;
 
     private static final String STUDENT_NULL = "Aluno não pode ser nulo";
 

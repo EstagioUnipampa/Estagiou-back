@@ -15,7 +15,9 @@ import com.lab.estagiou.exception.generic.RegisterException;
 import com.lab.estagiou.exception.generic.UpdateException;
 import com.lab.estagiou.model.admin.AdminEntity;
 import com.lab.estagiou.model.company.CompanyEntity;
+import com.lab.estagiou.model.course.CourseEntity;
 import com.lab.estagiou.model.enrollment.EnrollmentEntity;
+import com.lab.estagiou.model.skill.SkillEntity;
 import com.lab.estagiou.model.user.UserEntity;
 
 import jakarta.persistence.Column;
@@ -24,6 +26,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -75,7 +78,16 @@ public class JobVacancyEntity implements Serializable {
     @JsonManagedReference
     private CompanyEntity company;
 
-    public JobVacancyEntity(JobVacancyRegisterRequest request, CompanyEntity company) {
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private CourseEntity course;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "jobVacancies")
+    private List<SkillEntity> skills;
+
+    public JobVacancyEntity(JobVacancyRegisterRequest request, CompanyEntity company, List<SkillEntity> skills,
+            CourseEntity courseEntity) {
         if (request == null) {
             throw new RegisterException("Request cannot be null");
         }
@@ -117,6 +129,8 @@ public class JobVacancyEntity implements Serializable {
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
         this.company = company;
+        this.skills = skills;
+        this.course = courseEntity;
     }
 
     public void update(JobVacancyRegisterRequest request) {

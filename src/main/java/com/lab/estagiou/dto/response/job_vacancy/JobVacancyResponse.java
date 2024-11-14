@@ -22,6 +22,7 @@ public class JobVacancyResponse {
     private String hours;
     private String modality;
     private CompanyResponse company;
+    private List<SkillResponse> skills;
 
     public JobVacancyResponse(JobVacancyEntity entity) {
         this.id = entity.getId();
@@ -32,6 +33,7 @@ public class JobVacancyResponse {
         this.hours = entity.getHours();
         this.modality = entity.getModality();
         this.company = new CompanyResponse(entity.getCompany());
+        this.skills = entity.getSkills().stream().map(SkillResponse::new).collect(Collectors.toList());
     }
 
     public static List<JobVacancyResponse> fromEntityList(List<JobVacancyEntity> jobVacancies) {
