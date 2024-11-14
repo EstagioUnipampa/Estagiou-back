@@ -23,6 +23,7 @@ import com.lab.estagiou.controller.util.UtilController;
 import com.lab.estagiou.dto.request.model.jobvacancy.JobVacancyRegisterRequest;
 import com.lab.estagiou.dto.response.error.ErrorResponse;
 import com.lab.estagiou.dto.response.job_vacancy.JobVacancyResponse;
+import com.lab.estagiou.dto.response.job_vacancy.JobVacancyResponseEnrollment;
 import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 import com.lab.estagiou.service.JobVacancyService;
@@ -83,10 +84,28 @@ public class JobVacancyController {
             @ApiResponse(responseCode = "404", description = "Job vacancy not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
+    @PreAuthorize("hasAnyRole('ROLE_COMPANY, ROLE_STUDENT')")
     @GetMapping("/{id}")
     public ResponseEntity<JobVacancyResponse> searchJobVacancyById(@PathVariable UUID id) {
         JobVacancyEntity jobVacancy = jobVacancyService.searchJobVacancyById(id);
         JobVacancyResponse response = new JobVacancyResponse(jobVacancy);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Search job vacancy by ID", description = "Search a job vacancy by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Job vacancy found successfully", content = @Content(schema = @Schema(implementation = JobVacancyEntity.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Job vacancy not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @PreAuthorize("hasRole('ROLE_COMPANY')")
+    @GetMapping("/{id}/enrollments")
+    public ResponseEntity<JobVacancyResponseEnrollment> searchJobVacancyEnrollmentsById(@PathVariable UUID id) {
+        JobVacancyEntity jobVacancy = jobVacancyService.searchJobVacancyById(id);
+        JobVacancyResponseEnrollment response = new JobVacancyResponseEnrollment(jobVacancy);
 
         return ResponseEntity.ok(response);
     }
