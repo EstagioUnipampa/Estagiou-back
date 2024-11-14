@@ -44,8 +44,6 @@ public class EnrollmentEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private byte[] file;
-
     @Column(name = "created_at")
     private Instant createdAt;
 
@@ -63,32 +61,6 @@ public class EnrollmentEntity implements Serializable {
     private JobVacancyEntity jobVacancy;
 
     public EnrollmentEntity(EnrollmentRegisterRequest request, StudentEntity student, JobVacancyEntity jobVacancy) {
-
-        if (request == null) {
-            throw new RegisterException("Request não pode ser nulo");
-        }
-
-        if (request.getStudentId() == null) {
-            throw new RegisterException("Id do estudante não pode ser nulo");
-        }
-
-        if (request.getJobVacancyId() == null) {
-            throw new RegisterException("Id da vaga não pode ser nulo");
-        }
-
-        // if (request.getFile() == null) {
-        // throw new RegisterException("Arquivo não pode ser nulo");
-        // }
-
-        // try {
-        // if (request.getFile().get(0).getBytes().length == 0) {
-        // throw new RegisterException("Arquivo não pode ser vazio");
-        // }
-        // this.file = request.getFile().get(0).getBytes();
-        // } catch (IOException e) {
-        // throw new RegisterException("Erro ao tentar ler o arquivo");
-        // }
-
         this.student = student;
         this.jobVacancy = jobVacancy;
         this.createdAt = Instant.now();

@@ -1,12 +1,10 @@
 package com.lab.estagiou.service;
 
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,15 +14,13 @@ import com.lab.estagiou.dto.request.model.enrollment.EnrollmentRegisterRequest;
 import com.lab.estagiou.exception.generic.NoContentException;
 import com.lab.estagiou.exception.generic.NotFoundException;
 import com.lab.estagiou.exception.generic.RegisterException;
-import com.lab.estagiou.exception.generic.UnauthorizedUserException;
+import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.enrollment.EnrollmentEntity;
 import com.lab.estagiou.model.enrollment.EnrollmentRepository;
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 import com.lab.estagiou.model.jobvacancy.JobVacancyRepository;
-import com.lab.estagiou.model.log.LogEnum;
 import com.lab.estagiou.model.student.StudentEntity;
 import com.lab.estagiou.model.student.StudentRepository;
-import com.lab.estagiou.model.user.UserEntity;
 
 @Service
 public class EnrollmentService {
@@ -40,8 +36,8 @@ public class EnrollmentService {
 
     private static final String ENROLLMENT_NOT_FOUND = "Enrollment not found: ";
 
-    public ResponseEntity<Object> registerEnrollment(EnrollmentRegisterRequest request) {
-        StudentEntity student = studentRepository.findById(request.getStudentId())
+    public EnrollmentEntity registerEnrollment(EnrollmentRegisterRequest request, JwtUserDetails userDetails) {
+        StudentEntity student = studentRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new NotFoundException("Student not found"));
 
         JobVacancyEntity jobVacancy = jobVacancyRepository.findById(request.getJobVacancyId())
@@ -51,41 +47,19 @@ public class EnrollmentService {
             throw new RegisterException("Inscrição já realizada");
         }
 
-        // if (request.getFile() == null) {
-        // throw new RegisterException("Um arquivo é necessário");
-        // }
-
-        // if (request.getFile().size() > 1) {
-        // throw new RegisterException("Só é permitido o envio de 01 arquivo.");
-        // }
-
-        // String contentType = request.getFile().get(0).getContentType();
-        // if (contentType == null) {
-        // throw new RegisterException("Formato de arquivo inválido");
-        // }
-
-        // if (!contentType.equals(MediaType.APPLICATION_PDF_VALUE)) {
-        // throw new RegisterException("Formato de arquivo inválido");
-        // }
-
         EnrollmentEntity enrollment = new EnrollmentEntity(request, student, jobVacancy);
-        enrollmentRepository.save(enrollment);
 
-        URI uri = URI.create("/enrollment/" + enrollment.getId());
-
-        return ResponseEntity.created(uri).build();
+        return enrollmentRepository.save(enrollment);
     }
 
-    public ResponseEntity<List<EnrollmentEntity>> listEnrollments() {
+    public List<EnrollmentEntity> listEnrollments() {
         List<EnrollmentEntity> enrollments = enrollmentRepository.findAll();
 
         if (enrollments.isEmpty()) {
             throw new NoContentException("No enrollments registered");
         }
 
-        // log(LogEnum.INFO, "List enrollments: " + enrollments.size() + " enrollments",
-        // HttpStatus.OK.value());
-        return ResponseEntity.ok(enrollments);
+        return enrollments;
     }
 
     public ResponseEntity<Object> searchEnrollmentById(UUID id) {
@@ -101,9 +75,11 @@ public class EnrollmentService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentLength(enrollment.getFile().length);
+        // headers.setContentLength(enrollment.getFile().length);
 
-        return ResponseEntity.ok().headers(headers).body(enrollment.getFile());
+        // return ResponseEntity.ok().headers(headers).body(enrollment.getFile());
+
+        return null;
     }
 
     public ResponseEntity<Object> deleteEnrollmentById(UUID id, Authentication authentication) {

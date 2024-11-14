@@ -1,6 +1,7 @@
 package com.lab.estagiou.controller;
 
 import java.util.UUID;
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +17,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.lab.estagiou.controller.util.UtilController;
 import com.lab.estagiou.dto.request.model.enrollment.EnrollmentRegisterRequest;
+import com.lab.estagiou.dto.response.enrollment.EnrollmentResponse;
 import com.lab.estagiou.dto.response.error.ErrorResponse;
+import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.enrollment.EnrollmentEntity;
 import com.lab.estagiou.service.EnrollmentService;
 
@@ -46,8 +51,13 @@ public class EnrollmentController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/register")
-    public ResponseEntity<Object> registerEnrollment(@ModelAttribute EnrollmentRegisterRequest request) {
-        return enrollmentService.registerEnrollment(request);
+    public ResponseEntity<EnrollmentResponse> registerEnrollment(@RequestBody EnrollmentRegisterRequest request,
+            @AuthenticationPrincipal JwtUserDetails userDetails) {
+
+        EnrollmentEntity enrollmentEntity = enrollmentService.registerEnrollment(request, userDetails);
+        EnrollmentResponse enrollmentResponse = new EnrollmentResponse(enrollmentEntity);
+
+        return ResponseEntity.created(URI.create("/enrollment/" + enrollmentEntity.getId())).body(enrollmentResponse);
     }
 
     @Operation(summary = "List enrollments", description = "List all enrollments")
@@ -60,8 +70,11 @@ public class EnrollmentController {
     })
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COMPANY', 'ROLE_STUDENT')")
     @GetMapping("/list")
-    public ResponseEntity<List<EnrollmentEntity>> listEnrollments() {
-        return enrollmentService.listEnrollments();
+    public ResponseEntity<List<EnrollmentResponse>> listEnrollments() {
+        List<EnrollmentEntity> enrollments = enrollmentService.listEnrollments();
+        List<EnrollmentResponse> enrollmentsResponse = EnrollmentResponse.convertList(enrollments);
+
+        return ResponseEntity.ok(enrollmentsResponse);
     }
 
     @Operation(summary = "Search enrollment by ID", description = "Search an enrollment by ID")
