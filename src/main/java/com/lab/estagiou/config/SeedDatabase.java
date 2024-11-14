@@ -105,6 +105,14 @@ public class SeedDatabase implements CommandLineRunner {
                 skillRepository.saveAll(skillsCC);
                 skillRepository.saveAll(skillsEC);
 
+                List<SkillEntity> skills = skillsES.subList(0, 6);
+                SkillEntity skill1 = skills.get(0);
+                SkillEntity skill2 = skills.get(1);
+                SkillEntity skill3 = skills.get(2);
+                SkillEntity skill4 = skills.get(3);
+                SkillEntity skill5 = skills.get(4);
+                SkillEntity skill6 = skills.get(5);
+
                 // Criação de estudantes, administradores, empresas, vagas e inscrições
                 StudentEntity student1 = new StudentEntity("Ricardo", "Costa", "ricardo@gmail.com", "123456", course1);
                 StudentEntity student2 = new StudentEntity("João", "Medina", "joao@gmail.com", "123456", course2);
@@ -112,6 +120,20 @@ public class SeedDatabase implements CommandLineRunner {
                 StudentEntity student4 = new StudentEntity("Emanuel", "Rosa", "emanuel@gmail.com", "123456", course2);
 
                 studentRepository.saveAll(Arrays.asList(student1, student2, student3, student4));
+
+                student1.setSkills(Arrays.asList(skill1, skill2, skill3, skill4));
+                student2.setSkills(Arrays.asList(skill2, skill3, skill4, skill5));
+                student3.setSkills(Arrays.asList(skill3, skill4, skill5, skill6));
+                student4.setSkills(Arrays.asList(skill1, skill3, skill5, skill6));
+                studentRepository.save(student1);
+
+                skill1.setStudents(Arrays.asList(student1, student4));
+                skill2.setStudents(Arrays.asList(student1, student2));
+                skill3.setStudents(Arrays.asList(student1, student2, student3, student4));
+                skill4.setStudents(Arrays.asList(student1, student2, student3));
+                skill5.setStudents(Arrays.asList(student2, student3, student4));
+                skill6.setStudents(Arrays.asList(student3, student4));
+                skillRepository.saveAll(Arrays.asList(skill1, skill2, skill3, skill4, skill5, skill6));
 
                 AdminRegisterRequest admin = new AdminRegisterRequest();
                 admin.setEmail("admin@gmail.com");
@@ -207,12 +229,6 @@ public class SeedDatabase implements CommandLineRunner {
                 jobVacancyRegisterRequest10.setSalary("7000.0");
                 jobVacancyRegisterRequest10.setHours("40");
                 jobVacancyRegisterRequest10.setModality("Híbrido");
-
-                List<SkillEntity> skills = skillsES.subList(0, 4);
-                SkillEntity skill1 = skills.get(0);
-                SkillEntity skill2 = skills.get(1);
-                SkillEntity skill3 = skills.get(2);
-                SkillEntity skill4 = skills.get(3);
 
                 JobVacancyEntity jobVacancy1 = new JobVacancyEntity(jobVacancyRegisterRequest1, company1,
                                 Arrays.asList(skill1, skill2, skill3, skill4),
