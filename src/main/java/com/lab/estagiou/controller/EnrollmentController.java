@@ -53,7 +53,6 @@ public class EnrollmentController {
     @PostMapping("/register")
     public ResponseEntity<EnrollmentResponse> registerEnrollment(@RequestBody EnrollmentRegisterRequest request,
             @AuthenticationPrincipal JwtUserDetails userDetails) {
-
         EnrollmentEntity enrollmentEntity = enrollmentService.registerEnrollment(request, userDetails);
         EnrollmentResponse enrollmentResponse = new EnrollmentResponse(enrollmentEntity);
 
@@ -72,6 +71,24 @@ public class EnrollmentController {
     @GetMapping("/list")
     public ResponseEntity<List<EnrollmentResponse>> listEnrollments() {
         List<EnrollmentEntity> enrollments = enrollmentService.listEnrollments();
+        List<EnrollmentResponse> enrollmentsResponse = EnrollmentResponse.convertList(enrollments);
+
+        return ResponseEntity.ok(enrollmentsResponse);
+    }
+
+    @Operation(summary = "Search enrollment by ID", description = "Search an enrollment by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Enrollment found successfully", content = @Content(schema = @Schema(implementation = EnrollmentEntity.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication expired", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "User not authorized", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Enrollment not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT')")
+    @GetMapping("/student")
+    public ResponseEntity<List<EnrollmentResponse>> searchEnrollmentById(
+            @AuthenticationPrincipal JwtUserDetails userDetails) {
+        List<EnrollmentEntity> enrollments = enrollmentService.searchStudentsEnrollmentsById(userDetails.getId());
         List<EnrollmentResponse> enrollmentsResponse = EnrollmentResponse.convertList(enrollments);
 
         return ResponseEntity.ok(enrollmentsResponse);

@@ -1,5 +1,6 @@
 package com.lab.estagiou.model.enrollment;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,8 @@ public interface EnrollmentRepository extends JpaRepository<EnrollmentEntity, UU
 
     @Query("SELECT EXISTS(SELECT 1 FROM enrollment e WHERE e.student = :studentEntity AND e.jobVacancy = :jobVacancyEntity)")
     public boolean existsByStudentIdAndJobVacancyId(StudentEntity studentEntity, JobVacancyEntity jobVacancyEntity);
+
+    public List<EnrollmentEntity> findByStudentId(UUID id);
+
+    public boolean existsByStudentIdAndJobVacancyId(UUID id, UUID id2);
 }

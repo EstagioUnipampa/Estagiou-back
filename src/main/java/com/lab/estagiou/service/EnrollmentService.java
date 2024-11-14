@@ -126,4 +126,15 @@ public class EnrollmentService {
         return ResponseEntity.noContent().build();
     }
 
+    public List<EnrollmentEntity> searchStudentsEnrollmentsById(UUID id) {
+
+        List<EnrollmentEntity> enrollments = enrollmentRepository.findByStudentId(id);
+
+        return enrollments;
+    }
+
+    public boolean isEnroll(UUID id, UUID id2) {
+        return enrollmentRepository.existsByStudentIdAndJobVacancyId(id, id2);
+    }
+
 }

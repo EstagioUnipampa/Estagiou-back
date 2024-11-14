@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.stream.Collectors;
@@ -23,6 +22,7 @@ public class JobVacancyResponse {
     private String modality;
     private CompanyResponse company;
     private List<SkillResponse> skills;
+    private boolean isEnroll;
 
     public JobVacancyResponse(JobVacancyEntity entity) {
         this.id = entity.getId();
@@ -34,6 +34,12 @@ public class JobVacancyResponse {
         this.modality = entity.getModality();
         this.company = new CompanyResponse(entity.getCompany());
         this.skills = entity.getSkills().stream().map(SkillResponse::new).collect(Collectors.toList());
+        this.isEnroll = false;
+    }
+
+    public JobVacancyResponse(JobVacancyEntity entity, boolean isEnroll) {
+        this(entity);
+        this.isEnroll = isEnroll;
     }
 
     public static List<JobVacancyResponse> fromEntityList(List<JobVacancyEntity> jobVacancies) {

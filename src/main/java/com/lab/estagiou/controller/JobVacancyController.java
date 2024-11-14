@@ -26,6 +26,7 @@ import com.lab.estagiou.dto.response.job_vacancy.JobVacancyResponse;
 import com.lab.estagiou.dto.response.job_vacancy.JobVacancyResponseEnrollment;
 import com.lab.estagiou.jwt.JwtUserDetails;
 import com.lab.estagiou.model.jobvacancy.JobVacancyEntity;
+import com.lab.estagiou.service.EnrollmentService;
 import com.lab.estagiou.service.JobVacancyService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +43,9 @@ public class JobVacancyController {
 
     @Autowired
     private JobVacancyService jobVacancyService;
+
+    @Autowired
+    private EnrollmentService enrollmentService;
 
     @Operation(summary = "Register job vacancy", description = "Register a job vacancy")
     @ApiResponses(value = {
@@ -84,11 +88,13 @@ public class JobVacancyController {
             @ApiResponse(responseCode = "404", description = "Job vacancy not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    @PreAuthorize("hasAnyRole('ROLE_COMPANY, ROLE_STUDENT')")
     @GetMapping("/{id}")
-    public ResponseEntity<JobVacancyResponse> searchJobVacancyById(@PathVariable UUID id) {
+    @PreAuthorize("hasAnyRole('ROLE_COMPANY', 'ROLE_STUDENT')")
+    public ResponseEntity<JobVacancyResponse> searchJobVacancyById(@PathVariable UUID id,
+            @AuthenticationPrincipal JwtUserDetails jwtUserDetails) {
         JobVacancyEntity jobVacancy = jobVacancyService.searchJobVacancyById(id);
-        JobVacancyResponse response = new JobVacancyResponse(jobVacancy);
+        boolean isEnroll = enrollmentService.isEnroll(jwtUserDetails.getId(), id);
+        JobVacancyResponse response = new JobVacancyResponse(jobVacancy, isEnroll);
 
         return ResponseEntity.ok(response);
     }
